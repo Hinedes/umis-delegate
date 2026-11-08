@@ -3,9 +3,11 @@
 Idempotent: rerunning keeps existing rows and only fills what is missing.
 ``--reset`` clears demo visits, lines, payments, and expenses, keeps Maria
 Ivanova, and recreates her canonical requested visit.
-Never creates real patient data. Every demo account uses ``DEMO_PASSWORD``.
+Never creates real patient data. New demo accounts share one password: the
+``DEMO_PASSWORD`` setting, or a random one printed once when it is unset.
 """
 
+import secrets
 from datetime import datetime, time, timedelta
 from decimal import Decimal
 
@@ -35,7 +37,6 @@ from core.models import (
 
 User = get_user_model()
 
-DEMO_PASSWORD = 'umis-demo-2026'
 MARIA_NAME = 'Maria Ivanova'
 MARIA_PHONE = '+79161234568'
 MARIA_COMMENT = 'Synthetic demo request for Dr. Smirnov.'
@@ -165,18 +166,21 @@ class Command(BaseCommand):
 
     def _seed_users(self):
         users = {}
+        password = settings.DEMO_PASSWORD or secrets.token_urlsafe(12)
+        created = False
         for spec in DEMO_USERS:
             user = User.objects.filter(username=spec['username']).first()
             if user is None:
                 user = User.objects.create_user(
                     username=spec['username'],
-                    password=DEMO_PASSWORD,
+                    password=password,
                     first_name=spec['first_name'],
                     last_name=spec['last_name'],
                     is_staff=spec['superuser'],
                     is_superuser=spec['superuser'],
                 )
                 state = f"Created user '{user.username}'"
+                created = True
             else:
                 state = f"User '{user.username}' exists"
 
@@ -193,6 +197,8 @@ class Command(BaseCommand):
             self.stdout.write(state)
             users[spec['username']] = user
 
+        if created and not settings.DEMO_PASSWORD:
+            self.stdout.write(self.style.WARNING(f'Password for new demo accounts: {password}'))
         return users
 
     def _seed_catalog(self):

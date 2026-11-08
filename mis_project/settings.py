@@ -131,6 +131,8 @@ BOOKING_SLOT_MINUTES = int(os.environ.get('BOOKING_SLOT_MINUTES', '30'))
 # --- Demo data -----------------------------------------------------------------
 # Destructive demo reset is opt-in. Never enable this on a real clinic database.
 DEMO_ALLOW_RESET = os.environ.get('DEMO_ALLOW_RESET', 'False') == 'True'
+# Shared password for accounts seed_demo creates; blank = random, printed once.
+DEMO_PASSWORD = os.environ.get('DEMO_PASSWORD', '')
 
 # --- Agent control ---------------------------------------------------------------
 # Secret lives in deployment configuration only. The base URL and timeout are
