@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "New expense" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="expense-form-shell">
+    <h1 class="form-title">{% translate "New expense" %}</h1>
+    <div class="card-core" data-ui="expense-form-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions" data-ui="expense-form-actions">
+                    <a href="{% url 'accountant_dashboard' %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-primary">{% translate "Save" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

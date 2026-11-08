@@ -1,0 +1,22 @@
+{% load i18n %}
+{# Usage: include with page_obj and optional qs (extra query string starting with &). #}
+{% if page_obj.has_other_pages %}
+<div class="workspace-footer patient-registry-footer" data-ui="pagination">
+    <p class="workspace-footer-text patient-registry-footer-text">
+        {% translate "Page" %} {{ page_obj.number }} {% translate "of" %} {{ page_obj.paginator.num_pages }}
+    </p>
+    <div class="workspace-pagination patient-registry-pagination" aria-label="{% translate 'Pagination' %}">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{{ qs }}" class="workspace-page-btn patient-registry-page-btn" aria-label="{% translate 'Previous page' %}"><span class="material-symbols-outlined" aria-hidden="true">chevron_left</span></a>
+        {% else %}
+        <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true"><span class="material-symbols-outlined">chevron_left</span></span>
+        {% endif %}
+        <span class="workspace-page-btn patient-registry-page-btn is-current" aria-current="page">{{ page_obj.number }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{{ qs }}" class="workspace-page-btn patient-registry-page-btn" aria-label="{% translate 'Next page' %}"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></a>
+        {% else %}
+        <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true"><span class="material-symbols-outlined">chevron_right</span></span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

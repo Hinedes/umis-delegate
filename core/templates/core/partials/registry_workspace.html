@@ -1,0 +1,50 @@
+{% load i18n %}
+<div id="registry-workspace-container"
+     class="workspace-shell registry-workspace-shell"
+     data-ui="registry-workspace-shell"
+     hx-get="{{ request.get_full_path }}"
+     hx-trigger="patientChanged from:body, visitChanged from:body"
+     hx-target="#registry-workspace-container"
+     hx-select="#registry-workspace-container"
+     hx-select-oob="#messages-container"
+     hx-swap="outerHTML"
+     hx-push-url="true">
+    {% if is_htmx %}
+    {% include 'core/partials/header.html' with oob_swap=True %}
+    {% include 'core/partials/sidebar.html' with oob_swap=True %}
+    {% endif %}
+    <div class="{% if active_registry_source == 'patients' %}patient-list-shell{% else %}visit-list-shell{% endif %}"
+         data-ui="{% if active_registry_source == 'patients' %}patient-list-shell{% else %}visit-list-shell{% endif %}">
+        <section class="workspace-toolbar patient-list-toolbar patient-registry-toolbar registry-workspace-toolbar"
+                 data-ui="{% if active_registry_source == 'patients' %}patient-list-toolbar{% else %}visit-list-toolbar{% endif %}">
+            <div class="workspace-hero patient-registry-hero">
+                <div class="workspace-heading-block patient-registry-heading-block">
+                    <h1 class="workspace-title patient-registry-title">
+                        {% if active_registry_source == 'patients' %}{% translate "Patient registry" %}{% else %}{% translate "Visit registry" %}{% endif %}
+                    </h1>
+                </div>
+                {% if active_registry_source == 'patients' and perms.core.add_patient %}
+                <a href="{% url 'patient_create' %}"
+                   class="workspace-primary-action btn-core btn-core-lg btn-primary patient-registry-add-btn"
+                   hx-boost="false">
+                    <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+                    <span>{% translate "New patient" %}</span>
+                </a>
+                {% elif active_registry_source == 'visits' and perms.core.add_visit %}
+                <a href="{% url 'visit_create' %}"
+                   class="workspace-primary-action btn-core btn-core-lg btn-primary patient-registry-add-btn"
+                   hx-boost="false">
+                    <span class="material-symbols-outlined" aria-hidden="true">event_available</span>
+                    <span>{% translate "New visit" %}</span>
+                </a>
+                {% endif %}
+            </div>
+
+            {% if active_registry_source == 'patients' %}
+            {% include 'core/partials/registry_patients_panel.html' %}
+            {% else %}
+            {% include 'core/partials/registry_visits_panel.html' %}
+            {% endif %}
+        </section>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %} Patient · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="patient-form-shell">
+    <h1 class="form-title">
+        {% if form.instance.pk %}{% translate "Edit patient" %}{% else %}{% translate "New patient" %}{% endif %}
+    </h1>
+
+    <div class="card-core" data-ui="patient-form-fields">
+        <div class="card-body">
+            <form method="post" id="patient-form"
+                  hx-post="{{ request.get_full_path }}"
+                  hx-select="#patient-form"
+                  hx-select-oob="#messages-container"
+                  hx-target="#patient-form"
+                  hx-swap="outerHTML"
+                  x-data="{ isSubmitting: false }"
+                  @submit="if($el.checkValidity()) isSubmitting = true"
+                  hx-on::after-request="isSubmitting = false"
+                  novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}<div class="alert-core alert-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+                {% if form.duplicate_warning %}
+                <div class="alert-core alert-warning">
+                    <div>
+                        <strong>{% translate "Warning:" %}</strong> {{ form.duplicate_warning }}
+                        <div class="form-inline-action">
+                            <button type="submit" name="confirm_duplicate" value="1" class="btn-core btn-primary btn-compact" x-bind:disabled="isSubmitting">
+                                {% translate "Save anyway" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} *</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}
+                    <div class="form-field-error">
+                        {{ form.full_name.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.national_id.id_for_label }}">{{ form.national_id.label }}</label>
+                        {{ form.national_id }}
+                        {{ form.national_id.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+                    {{ form.birth_date }}
+                    {{ form.birth_date.errors }}
+                </div>
+
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }} *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                        <div class="form-field-error">
+                            {{ form.phone.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.floor.id_for_label }}">{{ form.floor.label }} *</label>
+                        {{ form.floor }}
+                        {{ form.floor.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                    {{ form.notes }}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-core btn-primary" x-bind:disabled="isSubmitting">
+                        <span x-cloak x-show="isSubmitting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        {% translate "Save patient" %}
+                    </button>
+                    <a href="{% url 'patient_list' %}" class="btn-core btn-secondary">
+                        {% translate "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

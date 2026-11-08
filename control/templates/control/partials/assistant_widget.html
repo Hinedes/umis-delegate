@@ -1,0 +1,64 @@
+{% load i18n %}
+<div class="assistant" x-data="{ open: false }" @keydown.escape.window="open = false">
+    <section id="assistant-panel" class="assistant-panel" x-show="open" x-cloak
+             role="dialog" aria-modal="false" aria-labelledby="assistant-title">
+        <header class="assistant-head">
+            <h2 class="assistant-title" id="assistant-title">{% translate "Assistant" %}</h2>
+        </header>
+        <div id="assistant-log" class="assistant-log" aria-live="polite">
+            <div class="assistant-empty">
+                <p>{% translate "The agent does tasks in UMIS for you." %}</p>
+                <p>{% translate "Try:" %}
+                    <button type="button" class="assistant-example"
+                            @click="$refs.goal.value = $el.textContent.trim(); $refs.goal.focus()">{% translate "How many visits do we have today?" %}</button>
+                </p>
+            </div>
+            <div id="assistant-thread" class="assistant-thread"></div>
+            <div id="assistant-typing" class="assistant-turn is-agent assistant-typing htmx-indicator">
+                <span class="assistant-who">{% translate "Agent" %}</span>
+                <p class="assistant-bubble" aria-label="{% translate 'The agent is working' %}"><span></span><span></span><span></span></p>
+            </div>
+        </div>
+
+        <form class="assistant-form"
+              hx-post="{% url 'control_ask' %}"
+              hx-target="#assistant-thread"
+              hx-swap="beforeend"
+              hx-indicator="#assistant-typing"
+              hx-disabled-elt="find button[type=submit]"
+              @htmx:before-request="
+                  const text = $refs.goal.value.trim();
+                  if (!text) { $event.preventDefault(); return; }
+                  const turn = document.createElement('div');
+                  turn.className = 'assistant-turn is-user';
+                  const who = document.createElement('span');
+                  who.className = 'assistant-who';
+                  who.textContent = '{% translate "You" %}';
+                  const bubble = document.createElement('p');
+                  bubble.className = 'assistant-bubble';
+                  bubble.textContent = text;
+                  turn.append(who, bubble);
+                  document.getElementById('assistant-thread').append(turn);
+                  $refs.goal.value = '';
+                  $nextTick(() => { const log = document.getElementById('assistant-log'); log.scrollTop = log.scrollHeight; });"
+              @htmx:after-settle="const log = document.getElementById('assistant-log'); log.scrollTop = log.scrollHeight; $refs.goal.focus()">
+            {% csrf_token %}
+            <input type="hidden" name="page" value="{{ request.path }}">
+            <label class="assistant-sr" for="assistant-goal">{% translate "Message the assistant" %}</label>
+            <textarea id="assistant-goal" name="goal" rows="1" maxlength="4000"
+                      class="assistant-input" x-ref="goal" placeholder="{% translate 'Write here…' %}"
+                      @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit(); }"></textarea>
+            <button type="submit" class="assistant-send" aria-label="{% translate 'Send message' %}" title="{% translate 'Send (Enter)' %}">
+                <span class="material-symbols-outlined" aria-hidden="true">send</span>
+            </button>
+        </form>
+    </section>
+
+    <button type="button" class="assistant-launcher"
+            @click="open = !open; if (open) $nextTick(() => $refs.goal.focus())"
+            :aria-expanded="open.toString()" aria-controls="assistant-panel"
+            :aria-label="open ? '{% translate "Close assistant" %}' : '{% translate "Open assistant" %}'"
+            title="{% translate 'Assistant (Esc closes)' %}">
+        <span class="material-symbols-outlined" aria-hidden="true" x-text="open ? 'close' : 'chat'">chat</span>
+    </button>
+</div>

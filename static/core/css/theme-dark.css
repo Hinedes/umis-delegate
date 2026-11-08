@@ -1,0 +1,1119 @@
+/* =============================================================================
+   DARK MODE STYLES
+   Calm, medical, precise. Soft mesh gradients and layered surfaces.
+   ============================================================================= */
+
+/* ---------- Dark Mode Variables ---------- */
+
+[data-color-scheme-resolved="dark"] {
+    color-scheme: dark;
+    --color-bg-app: #13141a;
+    --color-bg-app-rgb: 19 20 26;
+    --color-bg-surface-elevated: #1e1f24;
+    --color-bg-surface-elevated-rgb: 30 31 36;
+    --color-divider: rgba(255, 255, 255, 0.06);
+    --color-divider-rgb: 255 255 255;
+    --border-color: rgba(255, 255, 255, 0.10);
+    --border-color-rgb: 255 255 255;
+
+    --color-bg-body: #13141a;
+    --color-bg-body-rgb: 19 20 26;
+    --color-bg-surface: #22242d;
+    --color-bg-surface-rgb: 34 36 45;
+    --color-bg-sidebar: #0a0b0e;
+    --color-bg-sidebar-rgb: 10 11 14;
+    --color-bg-subtle: rgba(34, 35, 40, 0.5);
+    --color-bg-subtle-rgb: 34 35 40;
+    --color-border: rgba(255, 255, 255, 0.12);
+    --color-border-rgb: 255 255 255;
+    --color-border-strong: rgba(255, 255, 255, 0.20);
+    --color-border-strong-rgb: 255 255 255;
+    --color-text-main: #eaeef0;
+    --color-text-main-rgb: 234 238 240;
+    --color-text-muted: #9ca3af;
+    --color-text-muted-rgb: 156 163 175;
+    --color-text-inverse: #f9fafb;
+    --color-text-inverse-rgb: 249 250 251;
+    --color-gradient-brand: linear-gradient(135deg, #003f87 0%, #0056b3 100%);
+    --shadow-soft: 0px 12px 32px rgba(0, 0, 0, 0.18);
+    --shadow-nav: 0px -12px 32px rgba(0, 0, 0, 0.32);
+
+    --color-success: #4ae176;
+    --color-success-rgb: 74 225 118;
+    --color-success-bg: rgba(16, 185, 129, 0.2);
+    --color-success-bg-rgb: 16 185 129;
+    --color-success-text: #34d399;
+    --color-success-text-rgb: 52 211 153;
+    --color-warning: #fbbf24;
+    --color-warning-rgb: 251 191 36;
+    --color-warning-bg: rgba(245, 158, 11, 0.2);
+    --color-warning-bg-rgb: 245 158 11;
+    --color-warning-text: #fbbf24;
+    --color-warning-text-rgb: 251 191 36;
+    --color-danger: #f87171;
+    --color-danger-rgb: 248 113 113;
+    --color-danger-bg: rgba(239, 68, 68, 0.2);
+    --color-danger-bg-rgb: 239 68 68;
+    --color-danger-text: #f87171;
+    --color-danger-text-rgb: 248 113 113;
+
+    --color-primary: #6b9be0;
+    --color-primary-rgb: 107 155 224;
+    --color-primary-container: #003580;
+    --color-primary-container-rgb: 0 86 179;
+    --color-on-primary-container: #84a7ff;
+    --color-on-primary-container-rgb: 132 167 255;
+    --color-primary-hover: #d7e2ff;
+    --color-primary-hover-rgb: 215 226 255;
+    --color-secondary: #4ae176;
+    --color-secondary-rgb: 74 225 118;
+    --color-secondary-container: #00672c;
+    --color-secondary-container-rgb: 0 103 44;
+    --color-on-secondary-container: #4ae176;
+    --color-on-secondary-container-rgb: 74 225 118;
+    --color-tertiary: #4ae176;
+    --color-tertiary-rgb: 74 225 118;
+
+    /* Shadows */
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+    /* Semantic component tokens */
+    --color-surface-alt: rgba(30, 35, 50, 0.6);
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+    --color-border-subtle-rgb: 255 255 255;
+
+    /* Surface hierarchy tokens (dark overrides) */
+    --surface: rgba(14, 15, 20, 1);
+    --surface-rgb: 14 15 20;
+    --surface-container-low: rgba(28, 30, 36, 0.92);
+    --surface-container-low-rgb: 28 30 36;
+    --surface-container-lowest: rgba(40, 43, 50, 0.96);
+    --surface-container-lowest-rgb: 40 43 50;
+    --surface-container-high: rgba(38, 40, 46, 0.88);
+    --surface-container-high-rgb: 38 40 46;
+    --surface-container-highest: rgba(50, 52, 58, 0.88);
+    --surface-container-highest-rgb: 50 52 58;
+    --surface-container: rgba(24, 25, 30, 0.88);
+    --surface-container-rgb: 24 25 30;
+    --surface-dim: rgba(12, 13, 16, 1);
+    --surface-dim-rgb: 12 13 16;
+    --on-surface: #eaeef0;
+    --on-surface-rgb: 234 238 240;
+    --primary-fixed: #d7e2ff;
+    --primary-fixed-rgb: 215 226 255;
+
+    --shadow-ambient: 0px 12px 32px rgba(0, 0, 0, 0.35);
+    --color-overlay-subtle: rgba(255, 255, 255, 0.05);
+    --color-overlay-subtle-rgb: 255 255 255;
+    --color-warning-hover: #fbbf24;
+    --color-warning-hover-rgb: 251 191 36;
+    --color-danger-hover: #f87171;
+    --color-danger-hover-rgb: 248 113 113;
+    --color-danger: #f87171;
+    --color-danger-rgb: 248 113 113;
+
+    --color-alert-success-bg: rgba(16, 185, 129, 0.1);
+    --color-alert-success-bg-rgb: 16 185 129;
+    --color-alert-success-text: #34d399;
+    --color-alert-success-text-rgb: 52 211 153;
+    --color-alert-success-border: rgba(16, 185, 129, 0.2);
+    --color-alert-success-border-rgb: 16 185 129;
+    --color-alert-error-bg: rgba(239, 68, 68, 0.1);
+    --color-alert-error-bg-rgb: 239 68 68;
+    --color-alert-error-text: #f87171;
+    --color-alert-error-text-rgb: 248 113 113;
+    --color-alert-error-border: rgba(239, 68, 68, 0.2);
+    --color-alert-error-border-rgb: 239 68 68;
+    --color-alert-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-alert-warning-bg-rgb: 245 158 11;
+    --color-alert-warning-text: #fbbf24;
+    --color-alert-warning-text-rgb: 251 191 36;
+    --color-alert-warning-border: rgba(245, 158, 11, 0.2);
+    --color-alert-warning-border-rgb: 245 158 11;
+    --color-alert-info-bg: rgba(168, 184, 204, 0.1);
+    --color-alert-info-bg-rgb: 34 211 238;
+    --color-alert-info-text: #a8b8cc;
+    --color-alert-info-text-rgb: 34 211 238;
+    --color-alert-info-border: rgba(168, 184, 204, 0.2);
+    --color-alert-info-border-rgb: 34 211 238;
+
+    --color-status-completed-bg: rgba(16, 185, 129, 0.2);
+    --color-status-completed-bg-rgb: 16 185 129;
+    --color-status-completed-text: #34d399;
+    --color-status-completed-text-rgb: 52 211 153;
+    --color-status-pending-bg: rgba(245, 158, 11, 0.2);
+    --color-status-pending-bg-rgb: 245 158 11;
+    --color-status-pending-text: #fbbf24;
+    --color-status-pending-text-rgb: 251 191 36;
+    --color-status-cancelled-bg: rgba(239, 68, 68, 0.2);
+    --color-status-cancelled-bg-rgb: 239 68 68;
+    --color-status-cancelled-text: #f87171;
+    --color-status-cancelled-text-rgb: 248 113 113;
+
+    --color-badge-payment-bg: rgba(16, 185, 129, 0.2);
+    --color-badge-payment-bg-rgb: 16 185 129;
+    --color-badge-payment-text: #34d399;
+    --color-badge-payment-text-rgb: 52 211 153;
+    --color-badge-refund-bg: rgba(249, 115, 22, 0.2);
+    --color-badge-refund-bg-rgb: 249 115 22;
+    --color-badge-refund-text: #fb923c;
+    --color-badge-refund-text-rgb: 251 146 60;
+    --color-badge-cash-bg: rgba(16, 185, 129, 0.2);
+    --color-badge-cash-bg-rgb: 16 185 129;
+    --color-badge-cash-text: #34d399;
+    --color-badge-cash-text-rgb: 52 211 153;
+    --color-badge-mbank-bg: rgba(16, 185, 129, 0.2);
+    --color-badge-mbank-bg-rgb: 16 185 129;
+    --color-badge-mbank-text: #34d399;
+    --color-badge-mbank-text-rgb: 52 211 153;
+    --color-badge-bakai-bg: rgba(59, 130, 246, 0.2);
+    --color-badge-bakai-bg-rgb: 59 130 246;
+    --color-badge-bakai-text: #60a5fa;
+    --color-badge-bakai-text-rgb: 96 165 250;
+    --color-badge-mbusiness-bg: rgba(245, 158, 11, 0.2);
+    --color-badge-mbusiness-bg-rgb: 245 158 11;
+    --color-badge-mbusiness-text: #fbbf24;
+    --color-badge-mbusiness-text-rgb: 251 191 36;
+    --color-badge-visa-bg: rgba(99, 102, 241, 0.2);
+    --color-badge-visa-bg-rgb: 99 102 241;
+    --color-badge-visa-text: #818cf8;
+    --color-badge-visa-text-rgb: 129 140 248;
+    --color-badge-operation-bg: rgba(239, 68, 68, 0.2);
+    --color-badge-operation-bg-rgb: 239 68 68;
+    --color-badge-operation-text: #f87171;
+    --color-badge-operation-text-rgb: 248 113 113;
+    --color-badge-repeat-bg: rgba(245, 158, 11, 0.2);
+    --color-badge-repeat-bg-rgb: 245 158 11;
+    --color-badge-repeat-text: #fbbf24;
+    --color-badge-repeat-text-rgb: 251 191 36;
+    --color-badge-note-bg: rgba(14, 165, 233, 0.2);
+    --color-badge-note-bg-rgb: 14 165 233;
+    --color-badge-note-text: #38bdf8;
+    --color-badge-note-text-rgb: 56 189 248;
+    --color-badge-neutral-bg: rgba(100, 116, 139, 0.3);
+    --color-badge-neutral-bg-rgb: 100 116 139;
+    --color-badge-neutral-text: var(--color-text-main);
+    --color-badge-neutral-text-rgb: 218 226 253;
+
+    --color-card-header-danger-bg: rgba(239, 68, 68, 0.15);
+    --color-card-header-danger-bg-rgb: 239 68 68;
+    --color-card-header-danger-text: #f87171;
+    --color-card-header-danger-text-rgb: 248 113 113;
+    --color-card-header-danger-border: rgba(239, 68, 68, 0.3);
+    --color-card-header-danger-border-rgb: 239 68 68;
+    --color-card-header-warning-bg: rgba(245, 158, 11, 0.15);
+    --color-card-header-warning-bg-rgb: 245 158 11;
+    --color-card-header-warning-text: #fbbf24;
+    --color-card-header-warning-text-rgb: 251 191 36;
+    --color-card-header-warning-border: rgba(245, 158, 11, 0.3);
+    --color-card-header-warning-border-rgb: 245 158 11;
+    --color-card-header-info-bg: rgba(59, 130, 246, 0.15);
+    --color-card-header-info-bg-rgb: 59 130 246;
+    --color-card-header-info-text: #60a5fa;
+    --color-card-header-info-text-rgb: 96 165 250;
+    --color-card-header-info-border: rgba(59, 130, 246, 0.3);
+    --color-card-header-info-border-rgb: 59 130 246;
+
+    --color-services-header-bg: rgba(14, 165, 233, 0.15);
+    --color-services-header-bg-rgb: 14 165 233;
+    --color-services-header-text: #38bdf8;
+    --color-services-header-text-rgb: 56 189 248;
+    --color-medicines-header-bg: rgba(245, 158, 11, 0.15);
+    --color-medicines-header-bg-rgb: 245 158 11;
+    --color-medicines-header-text: #fbbf24;
+    --color-medicines-header-text-rgb: 251 191 36;
+
+    --color-payment-mbank-bg: rgba(16, 185, 129, 0.15);
+    --color-payment-mbank-bg-rgb: 16 185 129;
+    --color-payment-mbank-border: rgba(16, 185, 129, 0.4);
+    --color-payment-mbank-border-rgb: 16 185 129;
+    --color-payment-mbank-text: #34d399;
+    --color-payment-mbank-text-rgb: 52 211 153;
+    --color-payment-bakai-bg: rgba(59, 130, 246, 0.15);
+    --color-payment-bakai-bg-rgb: 59 130 246;
+    --color-payment-bakai-border: rgba(59, 130, 246, 0.4);
+    --color-payment-bakai-border-rgb: 59 130 246;
+    --color-payment-bakai-text: #60a5fa;
+    --color-payment-bakai-text-rgb: 96 165 250;
+    --color-payment-cash-bg: rgba(100, 116, 139, 0.2);
+    --color-payment-cash-bg-rgb: 100 116 139;
+    --color-payment-cash-border: rgba(100, 116, 139, 0.4);
+    --color-payment-cash-border-rgb: 100 116 139;
+    --color-payment-cash-value: var(--color-text-main);
+    --color-payment-cash-value-rgb: 218 226 253;
+    --color-payment-cash-label: var(--color-text-muted);
+    --color-payment-cash-label-rgb: 194 198 212;
+    --color-payment-mbusiness-bg: rgba(245, 158, 11, 0.15);
+    --color-payment-mbusiness-bg-rgb: 245 158 11;
+    --color-payment-mbusiness-border: rgba(245, 158, 11, 0.4);
+    --color-payment-mbusiness-border-rgb: 245 158 11;
+    --color-payment-mbusiness-text: #fbbf24;
+    --color-payment-mbusiness-text-rgb: 251 191 36;
+    --color-payment-expense-bg: rgba(239, 68, 68, 0.15);
+    --color-payment-expense-bg-rgb: 239 68 68;
+    --color-payment-expense-border: rgba(239, 68, 68, 0.4);
+    --color-payment-expense-border-rgb: 239 68 68;
+    --color-payment-expense-text: #f87171;
+    --color-payment-expense-text-rgb: 248 113 113;
+
+}
+
+/* ---------- Mesh Gradient Background (CSS-only) ---------- */
+/* Mesh-gradient base for .app-shell */
+
+/* ---------- Body & Layout ---------- */
+
+[data-color-scheme-resolved="dark"] body {
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .app-content {
+    background: transparent;
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .app-content.dashboard-canvas {
+    background: var(--surface);
+}
+
+/* ---------- Dark Mode Card Fixes ---------- */
+
+[data-color-scheme-resolved="dark"] .card-header {
+    background: var(--surface-container-low);
+    color: var(--color-text-main);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-color-scheme-resolved="dark"] .card-core {
+    background: var(--surface-container-low);
+    border: 1px solid var(--color-border-strong);
+}
+
+[data-color-scheme-resolved="dark"] .modal-content {
+    background: rgba(20, 25, 40, 0.95);
+    border: 1px solid var(--color-border-strong);
+}
+
+/* ---------- Clinical Authority Component Dark Overrides ---------- */
+
+[data-color-scheme-resolved="dark"] .form-control-core {
+    background: var(--surface-container-high);
+    border-color: transparent;
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .form-control-core:focus {
+    background: var(--surface-container);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(168, 184, 204, 0.15);
+}
+
+[data-color-scheme-resolved="dark"] .stat-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--color-border-strong);
+    border-top: 3px solid var(--color-primary);
+}
+
+[data-color-scheme-resolved="dark"] .stat-card .stat-value {
+    color: var(--color-primary);
+}
+
+[data-color-scheme-resolved="dark"] .stat-card .stat-label {
+    color: var(--color-text-muted);
+}
+
+[data-color-scheme-resolved="dark"] .empty-state {
+    color: var(--color-text-muted);
+}
+
+/* ---------- Generic Dark Mode Fixes (Apply to All Themes) ---------- */
+
+/* Form controls - ensure proper dark styling */
+[data-color-scheme-resolved="dark"] input,
+[data-color-scheme-resolved="dark"] select,
+[data-color-scheme-resolved="dark"] textarea,
+[data-color-scheme-resolved="dark"] input,
+[data-color-scheme-resolved="dark"] select,
+[data-color-scheme-resolved="dark"] textarea {
+    background-color: var(--surface-container-high);
+    color: var(--color-text-main);
+    border-color: var(--color-border);
+}
+
+[data-color-scheme-resolved="dark"] input::placeholder,
+[data-color-scheme-resolved="dark"] textarea::placeholder,
+[data-color-scheme-resolved="dark"] input::placeholder,
+[data-color-scheme-resolved="dark"] textarea::placeholder {
+    color: #64748b;
+}
+
+/* Tables */
+[data-color-scheme-resolved="dark"] .table-core {
+    color: var(--on-surface);
+}
+
+/* ---------- Glass Cards (The Recipe) ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .card-core {
+    background: rgba(30, 35, 50, 0.5) ;
+    border: 1px solid var(--color-border-strong);
+    border-top-color: rgba(255, 255, 255, 0.15) ;
+    border-radius: 20px ;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-card-header,
+[data-color-scheme-resolved="dark"] .visit-screen-hint,
+[data-color-scheme-resolved="dark"] .visit-screen-cancel-action,
+[data-color-scheme-resolved="dark"] .visit-summary-note {
+    background: rgb(var(--surface-container-low-rgb) / 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-catalog {
+    background: rgb(var(--surface-container-low-rgb) / 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card {
+    border-color: rgb(var(--color-border-subtle-rgb) / 0.28);
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-summary {
+    border-color: rgb(var(--color-border-subtle-rgb) / 0.28);
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-catalog-title,
+[data-color-scheme-resolved="dark"] .visit-screen-catalog-icon,
+[data-color-scheme-resolved="dark"] .visit-summary-panel-icon,
+[data-color-scheme-resolved="dark"] .visit-summary-panel-title,
+[data-color-scheme-resolved="dark"] .visit-summary-balance-label,
+[data-color-scheme-resolved="dark"] .visit-summary-balance-value {
+    color: rgb(var(--color-primary-rgb) / 0.96);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-field .form-control-core,
+[data-color-scheme-resolved="dark"] .visit-screen-search-input,
+[data-color-scheme-resolved="dark"] .visit-screen-field .ts-wrapper .ts-control,
+[data-color-scheme-resolved="dark"] .visit-screen-hint kbd {
+    background: rgb(var(--surface-container-high-rgb) / 0.9);
+    color: rgb(var(--on-surface-rgb) / 1);
+    border-color: transparent;
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field select.form-control-core,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field input.form-control-core,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field textarea.form-control-core,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field .ts-wrapper .ts-control {
+    background: rgb(var(--surface-container-high-rgb) / 0.9) !important;
+    color: rgb(var(--on-surface-rgb) / 1) !important;
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-field .form-control-core:focus,
+[data-color-scheme-resolved="dark"] .visit-screen-search-input:focus,
+[data-color-scheme-resolved="dark"] .visit-screen-field .ts-wrapper.focus .ts-control {
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+    border-color: rgb(var(--color-primary-rgb) / 0.45);
+    box-shadow: 0 0 0 3px rgb(var(--color-primary-rgb) / 0.14);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field select.form-control-core:focus,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field input.form-control-core:focus,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field textarea.form-control-core:focus,
+[data-color-scheme-resolved="dark"] .visit-screen-encounter-card .visit-screen-field .ts-wrapper.focus .ts-control {
+    background: rgb(var(--surface-container-high-rgb) / 0.9) !important;
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-hint kbd {
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+    color: rgb(var(--on-surface-rgb) / 1);
+    border-color: rgb(var(--color-border-subtle-rgb) / 0.32);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-service-tile:hover {
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-service-tile,
+[data-color-scheme-resolved="dark"] .visit-screen-service-tile.service-tile-medicine,
+[data-color-scheme-resolved="dark"] .visit-screen-catalog .visit-screen-search-input {
+    background: rgb(var(--surface-container-lowest-rgb) / 1);
+}
+
+[data-color-scheme-resolved="dark"] .visit-summary-empty,
+[data-color-scheme-resolved="dark"] .visit-summary-note,
+[data-color-scheme-resolved="dark"] .visit-summary-qty-input,
+[data-color-scheme-resolved="dark"] .visit-screen-summary .billing-qty-input {
+    background: rgb(var(--surface-container-low-rgb) / 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-service-badge {
+    background: rgb(var(--color-primary-rgb) / 0.2);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-service-badge-medicine {
+    background: rgb(var(--color-secondary-rgb) / 0.18);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-search-icon,
+[data-color-scheme-resolved="dark"] .visit-summary-empty-copy,
+[data-color-scheme-resolved="dark"] .visit-summary-item-caption,
+[data-color-scheme-resolved="dark"] .visit-summary-item-unit-price,
+[data-color-scheme-resolved="dark"] .visit-summary-stat-label,
+[data-color-scheme-resolved="dark"] .visit-summary-stat-value {
+    color: rgb(var(--color-text-muted-rgb) / 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .visit-summary-empty-title,
+[data-color-scheme-resolved="dark"] .visit-summary-item-name,
+[data-color-scheme-resolved="dark"] .visit-summary-note-copy,
+[data-color-scheme-resolved="dark"] .visit-summary-item-price {
+    color: rgb(var(--on-surface-rgb) / 1);
+}
+
+[data-color-scheme-resolved="dark"] .visit-summary-remove-btn,
+[data-color-scheme-resolved="dark"] .visit-screen-summary .billing-remove-btn {
+    background: rgb(var(--color-danger-rgb) / 0.18);
+    color: rgb(var(--color-danger-rgb) / 0.96);
+}
+
+[data-color-scheme-resolved="dark"] .visit-summary-stat-row-medicine .visit-summary-stat-label,
+[data-color-scheme-resolved="dark"] .visit-summary-stat-row-medicine .visit-summary-stat-value {
+    color: rgb(var(--color-success-rgb) / 0.96);
+}
+
+[data-color-scheme-resolved="dark"] .visit-screen-summary .summary-submit-btn {
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .card-header {
+    background: transparent ;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) ;
+    color: var(--color-text-main) ;
+    font-weight: 600;
+}
+
+/* ---------- Stat Cards - Glass with Gradient Accents ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card {
+    background: rgba(30, 35, 50, 0.5) ;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 24px ;
+    color: var(--color-text-main) ;
+}
+
+/* Subtle gradient glow on top edge */
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(168, 184, 204, 0.5) 50%,
+            transparent 100%);
+    border-radius: 2px;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card:hover {
+    background: rgba(35, 42, 58, 0.65);
+    border-color: rgba(168, 184, 204, 0.2);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(168, 184, 204, 0.08);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-label {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-value {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1.1;
+    margin: 0.75rem 0;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card:nth-child(1) .stat-value {
+    color: #a8b8cc;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card:nth-child(2) .stat-value {
+    color: var(--color-success-text);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .stat-card:nth-child(3) .stat-value {
+    color: #a78bfa;
+}
+
+/* ---------- Sidebar - Heavier Glass (Base Layer) ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .app-sidebar {
+    background: var(--color-bg-sidebar);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .nav-item {
+    color: var(--color-text-muted);
+    border-radius: 12px;
+    margin: 0.25rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-main);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .nav-item.active {
+    background: rgba(168, 184, 204, 0.15);
+    color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(168, 184, 204, 0.1);
+}
+
+/* ---------- Tables - Glass Rows ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .table-core th {
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: none;
+    padding: 1rem;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .table-core tbody tr {
+    background: rgba(30, 35, 50, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .table-core tbody tr:hover {
+    background: rgba(35, 42, 58, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .table-core td {
+    border: none;
+    color: var(--color-text-main);
+    padding: 1rem;
+}
+
+/* ---------- Forms - Glass Inputs ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .form-control-core {
+    background: rgba(20, 25, 40, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--color-text-main);
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .form-control-core:focus {
+    background: rgba(25, 30, 45, 0.8);
+    border-color: rgba(168, 184, 204, 0.4);
+    box-shadow: 0 0 0 3px rgba(168, 184, 204, 0.1);
+    outline: none;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .form-control-core::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* ---------- Buttons - Glass Style ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .btn-primary {
+    background: var(--color-primary);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #0a0e1a;
+    font-weight: 600;
+    box-shadow: none;
+    transition: background-color 0.15s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .btn-primary:hover {
+    background: var(--color-on-primary-container);
+    box-shadow: none;
+    transform: none;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .btn-secondary {
+    background: rgba(30, 35, 50, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--color-text-main);
+    transition: all 0.2s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .btn-secondary:hover {
+    background: rgba(40, 45, 60, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Alerts - Glass Style ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--color-success-text);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--color-danger-text);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--color-warning-text);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .alert-info {
+    background: rgba(168, 184, 204, 0.1);
+    border: 1px solid rgba(168, 184, 204, 0.2);
+    color: #a8b8cc;
+}
+
+/* ---------- Header - Glass Style ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .app-header {
+    background: rgba(10, 14, 26, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: none;
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+    overflow: hidden; /* Contain active indicator */
+}
+
+/* ---------- Modal - Glass Style ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .modal-content {
+    background: rgba(20, 25, 40, 0.95);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ---------- Service/Medicine Tiles (Visit Form) ---------- */
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .service-tile {
+    background: rgba(30, 35, 50, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--color-text-main);
+    transition: all 0.2s ease;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .service-tile:hover {
+    background: rgba(35, 42, 58, 0.7);
+    border-color: rgba(168, 184, 204, 0.3);
+    box-shadow: 0 4px 12px rgba(168, 184, 204, 0.1);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] .service-tile:active {
+    background: rgba(25, 30, 42, 0.8);
+}
+
+/* Medicine tiles with accent border */
+[data-theme="modern"][data-color-scheme-resolved="dark"] .service-tile[data-category="MEDICINE"] {
+    border-left: 3px solid rgba(251, 191, 36, 0.6);
+}
+
+/* Selected state for tiles */
+[data-theme="modern"][data-color-scheme-resolved="dark"] .service-tile.selected {
+    background: rgba(168, 184, 204, 0.15);
+    border-color: rgba(168, 184, 204, 0.5);
+    box-shadow: 0 0 20px rgba(168, 184, 204, 0.2);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] #serviceSearch {
+    background: rgba(30, 35, 50, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--color-text-main);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] #serviceSearch::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Billing table headers in visit form */
+[data-theme="modern"][data-color-scheme-resolved="dark"] tr#servicesHeader {
+    background: rgba(168, 184, 204, 0.1);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] tr#servicesHeader td {
+    color: #a8b8cc;
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] tr#medicinesHeader {
+    background: rgba(251, 191, 36, 0.1);
+}
+
+[data-theme="modern"][data-color-scheme-resolved="dark"] tr#medicinesHeader td {
+    color: var(--color-warning-text);
+}
+
+[data-color-scheme-resolved="dark"] .badge {
+    --bs-badge-color: var(--color-text-main);
+}
+
+/* =============================================================================
+   COMPONENT DARK MODE FIXES
+   ============================================================================= */
+
+[data-color-scheme-resolved="dark"] .card-header {
+    background: var(--surface-container-low) !important;
+}
+
+[data-color-scheme-resolved="dark"] .table-core th {
+    background: var(--surface-container-high);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-color-scheme-resolved="dark"] .table-core td {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-color-scheme-resolved="dark"] .table-core tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-color-scheme-resolved="dark"] hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+/* =============================================================================
+   STATUS BADGE DARK MODE
+   ============================================================================= */
+
+[data-color-scheme-resolved="dark"] .status-completed,
+[data-color-scheme-resolved="dark"] .status-paid,
+[data-color-scheme-resolved="dark"] .status-completed,
+[data-color-scheme-resolved="dark"] .status-paid {
+    background: var(--color-status-completed-bg);
+    color: var(--color-status-completed-text);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-color-scheme-resolved="dark"] .status-pending,
+[data-color-scheme-resolved="dark"] .status-partial,
+[data-color-scheme-resolved="dark"] .status-waiting,
+[data-color-scheme-resolved="dark"] .status-in_progress,
+[data-color-scheme-resolved="dark"] .status-pending,
+[data-color-scheme-resolved="dark"] .status-partial,
+[data-color-scheme-resolved="dark"] .status-waiting,
+[data-color-scheme-resolved="dark"] .status-in_progress {
+    background: var(--color-status-pending-bg);
+    color: var(--color-status-pending-text);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-color-scheme-resolved="dark"] .status-planned,
+[data-color-scheme-resolved="dark"] .status-requested,
+[data-color-scheme-resolved="dark"] .status-planned,
+[data-color-scheme-resolved="dark"] .status-requested {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--color-badge-bakai-text);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-color-scheme-resolved="dark"] .status-cancelled,
+[data-color-scheme-resolved="dark"] .status-due,
+[data-color-scheme-resolved="dark"] .status-no_show,
+[data-color-scheme-resolved="dark"] .status-overdue,
+[data-color-scheme-resolved="dark"] .status-cancelled,
+[data-color-scheme-resolved="dark"] .status-due,
+[data-color-scheme-resolved="dark"] .status-no_show,
+[data-color-scheme-resolved="dark"] .status-overdue {
+    background: var(--color-status-cancelled-bg);
+    color: var(--color-status-cancelled-text);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* =============================================================================
+   TOMSELECT DARK MODE
+   ============================================================================= */
+
+[data-color-scheme-resolved="dark"] .ts-wrapper .ts-control {
+    background: var(--surface-container-high) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-main) !important;
+}
+
+[data-color-scheme-resolved="dark"] .ts-wrapper .ts-control input {
+    color: var(--color-text-main) !important;
+}
+
+[data-color-scheme-resolved="dark"] .ts-dropdown {
+    background: rgba(20, 25, 40, 0.95) !important;
+    border-color: var(--color-border-strong) !important;
+}
+
+[data-color-scheme-resolved="dark"] .ts-dropdown .option {
+    color: var(--color-text-main) !important;
+}
+
+[data-color-scheme-resolved="dark"] .ts-dropdown .option.active {
+    background: rgba(168, 184, 204, 0.2) !important;
+    color: var(--color-primary) !important;
+}
+
+/* =============================================================================
+   PRIMARY BUTTON DARK MODE
+   The accent is light in dark mode, so white text washes out: use dark text.
+   ============================================================================= */
+
+[data-color-scheme-resolved="dark"] .btn-primary,
+[data-color-scheme-resolved="dark"] .btn-primary:hover {
+    color: #0a0e1a;
+}
+
+[data-color-scheme-resolved="dark"] .badge-mbank {
+    background: var(--color-badge-mbank-bg);
+    color: var(--color-badge-mbank-text);
+}
+
+[data-color-scheme-resolved="dark"] .badge-repeat {
+    background: var(--color-badge-repeat-bg);
+    color: var(--color-badge-repeat-text);
+}
+
+[data-color-scheme-resolved="dark"] .badge-note {
+    background: var(--color-badge-note-bg);
+    color: var(--color-badge-note-text);
+}
+
+[data-color-scheme-resolved="dark"] .badge-neutral {
+    background: var(--color-badge-neutral-bg);
+    color: var(--color-badge-neutral-text);
+}
+
+[data-color-scheme-resolved="dark"] .workspace-overline,
+[data-color-scheme-resolved="dark"] .patient-registry-overline {
+    color: rgba(var(--color-primary-rgb), 0.86);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-filter-tray {
+    background: var(--surface-container-low);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-filter-group {
+    background: rgba(var(--color-text-main-rgb), 0.08);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-filter-button {
+    color: rgba(var(--color-text-main-rgb), 0.72);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-filter-button:hover {
+    background: rgba(var(--color-text-main-rgb), 0.06);
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-filter-button.is-active {
+    background: var(--surface-container-highest);
+    color: var(--color-text-main);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-card {
+    box-shadow: var(--shadow-ambient);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-table th {
+    background: rgba(var(--color-text-main-rgb), 0.06);
+    color: rgba(var(--color-text-main-rgb), 0.76);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-row + .patient-registry-row td {
+    border-top-color: rgba(var(--color-border-rgb), 0.12);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-visit-btn {
+    background: rgba(var(--color-text-main-rgb), 0.08);
+    color: var(--color-primary);
+}
+
+[data-color-scheme-resolved="dark"] .patient-registry-visit-btn:hover {
+    background: rgba(var(--color-primary-rgb), 0.14);
+}
+
+[data-color-scheme-resolved="dark"] .workspace-footer,
+[data-color-scheme-resolved="dark"] .patient-registry-footer {
+    background: rgba(var(--color-bg-app-rgb), 0.24);
+}
+
+[data-color-scheme-resolved="dark"] .workspace-page-btn,
+[data-color-scheme-resolved="dark"] .patient-registry-page-btn {
+    border-color: rgba(var(--color-border-rgb), 0.18);
+    background: var(--surface-container-lowest);
+}
+
+[data-color-scheme-resolved="dark"] .workspace-page-btn.is-current,
+[data-color-scheme-resolved="dark"] .patient-registry-page-btn.is-current {
+    color: var(--color-bg-app);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-field {
+    background: rgba(var(--surface-container-lowest-rgb), 0.96);
+    box-shadow: inset 0 0 0 1px rgba(var(--color-border-rgb), 0.16);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-field::placeholder {
+    color: rgba(var(--color-text-muted-rgb), 0.78);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-field:focus {
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--color-primary-rgb), 0.44),
+        0 0 0 4px rgba(var(--color-primary-rgb), 0.12);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-filter-reset {
+    color: rgba(var(--color-text-muted-rgb), 0.88);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-filter-reset:hover {
+    color: var(--color-primary);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-value {
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-link {
+    color: rgba(var(--color-primary-rgb), 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-approve-btn {
+    background: rgba(var(--color-success-rgb), 0.18);
+    color: var(--color-success);
+}
+
+[data-color-scheme-resolved="dark"] .visit-registry-approve-btn:hover {
+    background: rgba(var(--color-success-rgb), 0.24);
+}
+
+[data-color-scheme-resolved="dark"] .card-header-warning {
+    background: var(--color-card-header-warning-bg);
+    color: var(--color-card-header-warning-text);
+    border-color: var(--color-card-header-warning-border);
+}
+
+/* Services/Medicines Headers - Dark Mode */
+[data-color-scheme-resolved="dark"] .services-header {
+    background: var(--color-services-header-bg);
+    color: var(--color-services-header-text);
+}
+
+[data-color-scheme-resolved="dark"] .medicines-header {
+    background: var(--color-medicines-header-bg);
+    color: var(--color-medicines-header-text);
+}
+
+/* Balance Colors - CSS Variables */
+:root {
+    --color-balance-positive: #28a745;
+    --color-balance-negative: #ef4444;
+}
+
+[data-color-scheme-resolved="dark"] {
+    --color-balance-positive: #34d399;
+    --color-balance-negative: #f87171;
+}
+
+/* Doctor Dashboard */
+
+[data-color-scheme-resolved="dark"] .doctor-feed-card--live {
+    background: rgb(var(--surface-container-low-rgb) / 0.96);
+}
+
+[data-color-scheme-resolved="dark"] .doctor-focus-stat {
+    background: rgb(var(--surface-container-high-rgb) / 0.92);
+}
+
+[data-color-scheme-resolved="dark"] .doctor-dashboard__action--surface {
+    background: rgb(var(--surface-container-high-rgb) / 0.94);
+    color: var(--color-text-main);
+}
+
+[data-color-scheme-resolved="dark"] .doctor-feed-card__cta {
+    background: rgba(var(--color-primary-rgb), 0.16);
+}
+
+[data-color-scheme-resolved="dark"] .doctor-feed-card__cta:hover {
+    background: rgba(var(--color-primary-rgb), 0.24);
+}
+[hidden] { display: none !important; }
+
+/* Keep a visible keyboard focus ring where component outlines are cleared. */
+body :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-text-main) !important;
+    outline-offset: 3px;
+}
+body :is(.btn-core, .workspace-page-btn, .workspace-tab-link, .patient-registry-filter-button, .visit-registry-filter-reset, .sidebar-nav .nav-item, .header-icon-btn, .login-theme-toggle, .login-submit, .ts-dropdown .option, .alert-close, .visit-summary-remove-btn, .visit-summary-qty-input) {
+    min-height: 44px;
+    min-width: 44px;
+}
+body :is(.form-control-core, .visit-registry-field, .login-input) {
+    min-height: 44px;
+    border-color: var(--color-text-muted);
+    color: var(--color-text-main);
+}
+body :is(input, textarea)::placeholder {
+    color: var(--color-text-muted) !important;
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .native-page > dl { grid-template-columns: minmax(0, 1fr); gap: .25rem; padding: 1rem; }
+    .native-page > dl dd { margin-bottom: .75rem; }
+    .native-page > form:has(input:not([type="hidden"]), select, textarea) { padding: 1rem; }
+    .form-grid-2col { grid-template-columns: minmax(0, 1fr); }
+    .form-actions { flex-wrap: wrap; }
+    .card-header-between { flex-wrap: wrap; gap: .75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html *, html *::before, html *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+[data-color-scheme-resolved="dark"] .workspace-page-btn.is-current {
+    background: var(--color-primary);
+    color: var(--color-bg-body);
+}
+[data-color-scheme-resolved="dark"] .status-planned { color: #93c5fd; }
+[data-color-scheme-resolved="dark"] .visit-screen-service-badge { color: var(--color-on-primary-container); }
+[data-color-scheme-resolved="dark"] :is(.btn-danger, form[action$="/delete/"] button, button[value="cancel"], button[value="reject"]) { color: var(--color-bg-body); }

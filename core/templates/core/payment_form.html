@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Record payment" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="payment-form-shell">
+    <div class="form-back-row">
+        <a href="{% url 'visit_detail' visit.pk %}" class="form-back-link">← {% translate "Back to visit" %}</a>
+    </div>
+    <h1 class="form-title">{% translate "Record payment" %}: {{ visit.patient.full_name }}</h1>
+    <div class="card-core" data-ui="payment-form-summary">
+        <div class="card-body">
+            <div class="detail-grid">
+                <span class="detail-label">{% translate "Billed total" %}</span>
+                <span class="detail-value">{{ visit.total_cost }}</span>
+                <span class="detail-label">{% translate "Settled paid" %}</span>
+                <span class="detail-value detail-value-success">{{ visit.amount_paid }}</span>
+                <span class="detail-label">{% translate "Amount due" %}</span>
+                <span class="detail-value{% if visit.amount_due %} detail-value-danger{% endif %}">{{ visit.amount_due }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-core surface-top" data-ui="payment-form-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions">
+                    <a href="{% url 'visit_detail' visit.pk %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-primary">{% translate "Record" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

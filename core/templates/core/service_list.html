@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load sorting_tags i18n %}
+
+{% block title %}{% translate "Services" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="card-core" data-ui="service-list-shell">
+    <div class="card-header card-header-between" data-ui="service-list-toolbar">
+        <span>{% translate "Services" %}</span>
+        {% if perms.core.add_service %}
+        <a href="{% url 'service_create' %}" class="btn-core btn-core-lg btn-primary">{% translate "New service" %}</a>
+        {% endif %}
+    </div>
+
+    <form method="get" class="catalog-filters">
+        <label for="category-filter">{% translate "Category" %}</label>
+        <select id="category-filter" name="category" class="form-control-core"><option value="">{% translate "All categories" %}</option>{% for value, label in category_choices %}<option value="{{ value }}" {% if current_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+        <button type="submit" class="btn-core btn-secondary">{% translate "Filter" %}</button>
+    </form>
+    <div id="service-grid"
+         class="card-body card-body-flush table-scroll"
+         hx-get="{{ request.get_full_path }}"
+         hx-trigger="serviceListChanged from:body"
+         hx-select="#service-grid"
+         hx-select-oob="#messages-container"
+         hx-swap="outerHTML"
+         data-ui="service-list-results">
+        <table class="table-core">
+            <thead>
+                <tr>
+                    <th>{% sort_header 'name' 'Service' %}</th>
+                    <th class="text-end">{% sort_header 'price' 'Price' %}</th>
+                    <th>{% sort_header 'active' 'Status' %}</th>
+                    <th class="text-end">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                <tr{% if not service.active %} class="row-faded"{% endif %}>
+                    <td class="table-cell-strong">{{ service.name }}</td>
+                    <td class="text-end">{{ service.price }}</td>
+                    <td>
+                        {% if service.active %}
+                        <span class="badge-core status-completed">
+                            {% translate "Active" %}
+                        </span>
+                        {% else %}
+                        <span class="badge-core status-cancelled">
+                            {% translate "Inactive" %}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="table-actions">
+                            {% if perms.core.change_service %}
+                            <a href="{% url 'service_edit' service.id %}"
+                               class="btn-core btn-secondary btn-compact">
+                                {% translate "Edit" %}
+                            </a>
+                            <form method="post" action="{% url 'service_toggle_active' service.id %}" class="action-form-reset action-form-inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn-core btn-compact {% if service.active %}btn-danger{% else %}btn-primary{% endif %} disabled:opacity-75 disabled:cursor-not-allowed">
+                                    {% if service.active %}{% translate "Deactivate" %}{% else %}{% translate "Activate" %}{% endif %}
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% if perms.core.delete_service %}
+                            <form method="post" action="{% url 'service_delete' service.id %}" class="action-form-reset action-form-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-core btn-danger btn-compact"
+                                        onclick="return confirm('Delete this service?');">
+                                    {% translate "Delete" %}
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="table-empty-cell" data-ui="service-list-empty">{% translate "No services match these filters. Add a service or change the category." %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

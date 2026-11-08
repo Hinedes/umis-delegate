@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Analytics" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="analytics-dashboard-shell">
+<div class="page-header-bar" data-ui="analytics-dashboard-toolbar">
+    <h1 class="page-heading">{% translate "Analytics" %}</h1>
+    {% include 'core/partials/period_filter.html' %}
+</div>
+
+<div class="stats-grid-auto" data-ui="analytics-dashboard-summary">
+    <div class="stat-card text-center">
+        <div class="stat-label">{% translate "Visits" %}</div>
+        <div class="stat-value">{{ summary.visits }}</div>
+    </div>
+    <div class="stat-card stat-card-success text-center">
+        <div class="stat-label">{% translate "Billed service value" %}</div>
+        <div class="stat-value">{{ summary.billed_service_total }}</div>
+    </div>
+    <div class="stat-card stat-card-primary text-center">
+        <div class="stat-label">{% translate "Average age" %}</div>
+        <div class="stat-value">{{ age.average|default:"-" }}</div>
+    </div>
+    <div class="stat-card text-center">
+        <div class="stat-label">{% translate "Without birth date" %}</div>
+        <div class="stat-value">{{ age.without_birth_date }}</div>
+    </div>
+</div>
+
+<div class="panel-grid-2 surface-top" data-ui="analytics-dashboard-results">
+    {% translate "By status" as t %}{% translate "Status" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_status %}
+    {% translate "By visit type" as t %}{% translate "Type" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_visit_type %}
+    {% translate "By floor" as t %}{% translate "Floor" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_floor %}
+    {% translate "By referral source" as t %}{% translate "Referral source" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_referral %}
+    {% translate "By doctor" as t %}{% translate "Doctor" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_doctor %}
+    {% translate "By weekday" as t %}{% translate "Weekday" as c %}{% include 'core/partials/analytics_table.html' with title=t column=c rows=by_weekday %}
+    <div class="card-core card-fill-height">
+        <div class="card-header"><h2 class="panel-title">{% translate "Patient age" %}</h2></div>
+        <div class="card-body">
+            <table class="table-core">
+                <thead><tr><th>{% translate "Age group" %}</th><th class="text-end">{% translate "Patients" %}</th></tr></thead>
+                <tbody>
+                    {% for bucket in age.buckets %}
+                    <tr><td>{{ bucket.label }}</td><td class="text-end table-cell-strong">{{ bucket.count }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

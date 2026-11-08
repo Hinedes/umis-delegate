@@ -1,0 +1,68 @@
+{% load i18n umis_ui %}
+<tr class="visit-registry-row">
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-patient">
+        <a href="{% url 'visit_detail' visit.id %}"
+           class="visit-registry-link"
+           hx-boost="false">
+            {{ visit.patient.full_name }}
+        </a>
+        <span class="visit-registry-subtle">
+            <span>{% translate "Visit" %} #{{ visit.id }}</span>
+            {% if visit.patient.phone %}
+            <span aria-hidden="true">•</span>
+            <span>{{ visit.patient.phone }}</span>
+            {% endif %}
+        </span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-doctor">
+        <span class="visit-registry-value">
+            {% if visit.assigned_doctor %}
+            {{ visit.assigned_doctor.get_full_name|default:visit.assigned_doctor.username }}
+            {% else %}
+            {% translate "Unassigned" %}
+            {% endif %}
+        </span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-date">
+        <span class="visit-registry-value">{{ visit.visit_datetime|en_date:"j M Y" }}</span>
+        <span class="visit-registry-subtle">{{ visit.visit_datetime|en_date:"H:i" }}</span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-state">
+        <span class="badge-core visit-registry-chip status-{{ visit.status|lower }}">
+            {{ visit.get_status_display }}
+        </span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-floor">
+        <span class="visit-registry-value">{{ visit.get_floor_display }}</span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-finance text-end">
+        <span class="visit-registry-finance-value">{{ visit.total_cost }}</span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-finance text-end">
+        <span class="visit-registry-finance-value {% if visit.amount_due > 0 %}amount-due{% else %}amount-cleared{% endif %}">{{ visit.amount_due }}</span>
+    </td>
+    <td class="patient-registry-cell visit-registry-cell visit-registry-cell-actions">
+        <div class="visit-registry-actions">
+            {% if visit.status == 'REQUESTED' and perms.core.change_visit %}
+            <form method="post"
+                  action="{% url 'visit_accept_request' visit.id %}"
+                  class="action-form-reset"
+                  hx-post="{% url 'visit_accept_request' visit.id %}"
+                  hx-target="#registry-workspace-container"
+                  hx-select="#registry-workspace-container"
+                  hx-select-oob="#messages-container"
+                  hx-swap="outerHTML">
+                {% csrf_token %}
+                <button type="submit" class="btn-core visit-registry-approve-btn">
+                    {% translate "Accept" %}
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'visit_detail' visit.id %}"
+               class="btn-core patient-registry-visit-btn visit-registry-open-btn"
+               hx-boost="false">
+                {% translate "Open" %}
+            </a>
+        </div>
+    </td>
+</tr>

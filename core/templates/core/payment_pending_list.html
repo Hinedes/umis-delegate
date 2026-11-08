@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Payments awaiting verification" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="payment-pending-list-shell">
+<div class="page-header-bar" data-ui="payment-pending-list-toolbar">
+    <h1 class="page-heading">{% translate "Payments awaiting verification" %}</h1>
+    <div class="page-header-actions">
+        <a href="{% url 'payment_ledger' %}" class="btn-core btn-secondary">{% translate "Back to ledger" %}</a>
+    </div>
+</div>
+
+<div class="card-core surface-top" data-ui="payment-pending-list-results">
+    <div class="card-header card-header-between">
+        <span>{% translate "Awaiting confirmation" %}</span>
+        <span class="card-header-meta">{{ page_obj.paginator.count }} {% translate "pending" %}</span>
+    </div>
+    <div class="card-body card-body-flush">
+        <table class="table-core">
+            <thead>
+                <tr>
+                    <th>{% translate "Recorded at" %}</th>
+                    <th>{% translate "Patient" %}</th>
+                    <th>{% translate "Amount" %}</th>
+                    <th>{% translate "Method" %}</th>
+                    <th>{% translate "Recorded by" %}</th>
+                    <th class="text-end">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in page_obj %}
+                <tr>
+                    <td>
+                        <div class="table-cell-strong text-nowrap">{{ payment.payment_datetime|en_date:"j M Y" }}</div>
+                        <div class="table-meta-text">{{ payment.payment_datetime|date:"H:i" }}</div>
+                    </td>
+                    <td><a href="{% url 'visit_detail' payment.visit_id %}" class="table-link table-link-primary">{{ payment.visit.patient.full_name }}</a></td>
+                    <td class="table-cell-strong">{{ payment.amount }}</td>
+                    <td><span class="badge-core badge-mbank">{{ payment.method.name }}</span></td>
+                    <td>{{ payment.created_by|default:"-" }}</td>
+                    <td class="text-end"><a href="{% url 'payment_verify' payment.pk %}" class="btn-core btn-primary btn-compact">{% translate "Verify" %}</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty-cell table-empty-cell-lg" data-ui="payment-pending-list-empty">{% translate "Nothing to verify." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include 'core/partials/pager.html' %}
+</div>
+{% endblock %}

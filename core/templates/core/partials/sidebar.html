@@ -1,0 +1,31 @@
+{% load i18n %}
+<aside id="app-sidebar-shell" class="app-sidebar"{% if oob_swap %} hx-swap-oob="outerHTML"{% endif %}>
+    <div class="sidebar-user-card">
+        <div class="sidebar-user-initials" aria-hidden="true">{{ user.username|slice:':1'|upper }}</div>
+        <div class="min-w-0"><h2 class="sidebar-user-displayname">{{ user.get_full_name|default:user.username }}</h2><p class="sidebar-user-role">{% for group in user.groups.all %}{{ group.name }}{% if not forloop.last %}, {% endif %}{% empty %}{% if user.is_superuser %}{% translate "Superuser" %}{% endif %}{% endfor %}</p></div>
+    </div>
+    <nav class="sidebar-nav" aria-label="{% translate 'Workspace navigation' %}">
+        <span class="nav-header">{% translate "Registry" %}</span>
+        <a href="{% url 'visit_list' %}" class="nav-item {% if 'visit' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">calendar_month</span>{% translate "Visits" %}</a>
+        {% if perms.core.practice_medicine %}<a href="{% url 'doctor_dashboard' %}" class="nav-item {% if 'doctor-dashboard' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">stethoscope</span>{% translate "My day" %}</a>{% endif %}
+        {% if perms.core.view_patient %}<a href="{% url 'patient_list' %}" class="nav-item {% if 'patient' in request.path or 'record/' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">group</span>{% translate "Patients" %}</a>{% endif %}
+        {% if perms.core.view_operation %}<a href="{% url 'operation_list' %}" class="nav-item {% if 'operations' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">medical_services</span>{% translate "Operations" %}</a>{% endif %}
+        {% if perms.core.view_medicationorder %}<a href="{% url 'medication_list' %}" class="nav-item {% if 'nurse/medications' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">medication</span>{% translate "Medications" %}</a>{% endif %}
+        {% if perms.core.view_payment_ledger or perms.core.verify_payment %}
+        <span class="nav-header">{% translate "Finance" %}</span>
+        {% if perms.core.view_payment_ledger %}<a href="{% url 'payment_ledger' %}" class="nav-item {% if 'ledger' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">payments</span>{% translate "Payments" %}</a><a href="{% url 'accountant_dashboard' %}" class="nav-item {% if 'accountant' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">account_balance</span>{% translate "Accounting" %}</a>{% endif %}
+        {% if perms.core.verify_payment %}<a href="{% url 'payment_pending_list' %}" class="nav-item {% if 'payments/pending' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">fact_check</span>{% translate "Payment verification" %}</a>{% endif %}
+        {% endif %}
+        {% if perms.core.view_visit %}<a href="{% url 'analytics_dashboard' %}" class="nav-item {% if 'analytics' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">monitoring</span>{% translate "Analytics" %}</a>{% endif %}
+        {% if perms.core.view_service or perms.inventory.manage_inventory or perms.core.manage_shift %}
+        <span class="nav-header">{% translate "Management" %}</span>
+        {% if perms.core.view_service %}<a href="{% url 'service_list' %}" class="nav-item {% if '/service' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">list_alt</span>{% translate "Services" %}</a>{% endif %}
+        {% if perms.inventory.manage_inventory %}<a href="{% url 'inventory:stock_list' %}" class="nav-item {% if '/stock' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">inventory_2</span>{% translate "Stock" %}</a>{% endif %}
+        {% if perms.core.manage_shift %}<a href="{% url 'shift_list' %}" class="nav-item {% if '/shift' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">work_history</span>{% translate "Shifts" %}</a>{% endif %}
+        {% endif %}
+        <span class="nav-header">{% translate "System" %}</span>
+        <a href="{% url 'control_panel' %}" class="nav-item {% if '/control' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">tune</span>{% translate "Agent control" %}</a>
+        {% if perms.core.view_auditlog %}<a href="{% url 'control_audit' %}" class="nav-item {% if '/control/audit' in request.path %}active{% endif %}"><span class="material-symbols-outlined nav-icon" aria-hidden="true">manage_search</span>{% translate "Audit activity" %}</a>{% endif %}
+        {% if user.is_staff %}<a href="{% url 'admin:index' %}" class="nav-item"><span class="material-symbols-outlined nav-icon" aria-hidden="true">admin_panel_settings</span>{% translate "Administration" %}</a>{% endif %}
+    </nav>
+</aside>

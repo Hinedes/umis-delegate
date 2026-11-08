@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Verify payment" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="payment-verify-shell">
+    <div class="form-back-row">
+        <a href="{% url 'payment_pending_list' %}" class="form-back-link">← {% translate "Back to verification queue" %}</a>
+    </div>
+    <h1 class="form-title">{% translate "Verify payment" %}</h1>
+    <div class="card-core" data-ui="payment-verify-summary">
+        <div class="card-header">{% translate "Payment" %} #{{ payment.pk }}</div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <span class="detail-label">{% translate "Patient" %}</span>
+                <span class="detail-value">{{ payment.visit.patient.full_name }}</span>
+                <span class="detail-label">{% translate "Amount" %}</span>
+                <span class="detail-value">{{ payment.amount }}</span>
+                <span class="detail-label">{% translate "Method" %}</span>
+                <span class="detail-value">{{ payment.method.name }}</span>
+                <span class="detail-label">{% translate "Recorded at" %}</span>
+                <span class="detail-value">{{ payment.payment_datetime|en_date }}</span>
+                <span class="detail-label">{% translate "Recorded by" %}</span>
+                <span class="detail-value">{{ payment.created_by|default:"-" }}</span>
+                {% if payment.notes %}
+                <span class="detail-label">{% translate "Notes" %}</span>
+                <span class="detail-value">{{ payment.notes }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-core surface-top" data-ui="payment-verify-form">
+        <div class="card-header">{% translate "Decision" %}</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions" data-ui="payment-verify-actions">
+                    <button type="submit" name="action" value="verify" class="btn-core btn-primary">{% translate "Verify" %}</button>
+                    <button type="submit" name="action" value="reject" class="btn-core btn-warning">{% translate "Reject" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

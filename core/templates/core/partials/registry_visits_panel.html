@@ -1,0 +1,194 @@
+{% load sorting_tags i18n %}
+
+<form method="get"
+      class="workspace-tray patient-registry-filter-tray visit-registry-filter-tray"
+      data-ui="visit-list-filters"
+      hx-get="{{ request.path }}"
+      hx-target="#registry-workspace-container"
+      hx-select="#registry-workspace-container"
+      hx-select-oob="#messages-container"
+      hx-swap="outerHTML"
+      hx-push-url="true">
+    <div class="workspace-tray-copy patient-registry-filter-copy">
+        <span class="material-symbols-outlined patient-registry-filter-icon" aria-hidden="true">tune</span>
+        <span class="workspace-tray-label patient-registry-filter-label">{% translate "Filters:" %}</span>
+    </div>
+    <div class="visit-registry-filter-grid">
+        <input type="text"
+               name="search"
+               class="visit-registry-field visit-registry-search"
+                placeholder="{% translate 'Patient, phone, or ID' %}"
+                aria-label="{% translate 'Search visits' %}"
+               value="{{ request.GET.search }}">
+
+        <select name="doctor" class="visit-registry-field" aria-label="{% translate 'Doctor' %}">
+            <option value="">{% translate "All doctors" %}</option>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.id }}" {% if request.GET.doctor|stringformat:"s" == doctor.id|stringformat:"s" %}selected{% endif %}>
+                {{ doctor }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <select name="status" class="visit-registry-field" aria-label="{% translate 'Status' %}">
+            <option value="">{% translate "All statuses" %}</option>
+            {% for value, label in status_choices %}<option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+
+        <input type="date"
+                name="date"
+                aria-label="{% translate 'Visit date' %}"
+               class="visit-registry-field"
+               value="{{ request.GET.date }}">
+    </div>
+    <div class="visit-registry-filter-actions">
+        <button type="submit" class="btn-core btn-primary visit-registry-filter-submit">
+            {% translate "Apply filters" %}
+        </button>
+        {% if request.GET.search or request.GET.doctor or request.GET.status or request.GET.date %}
+        <a href="{% url 'visit_list' %}"
+           hx-get="{% url 'visit_list' %}"
+           hx-target="#registry-workspace-container"
+           hx-select="#registry-workspace-container"
+           hx-select-oob="#messages-container"
+           hx-swap="outerHTML"
+           hx-push-url="true"
+           class="visit-registry-filter-reset">
+            {% translate "Reset" %}
+        </a>
+        {% endif %}
+    </div>
+</form>
+
+<div class="workspace-panel patient-registry-card" data-ui="visit-list-results">
+    <div class="workspace-scroll-region patient-registry-table-scroll visit-registry-table-scroll" tabindex="0" role="region" aria-label="{% translate 'Visit results' %}">
+        <table class="patient-registry-table visit-registry-table">
+            <thead>
+                <tr>
+                    <th class="visit-registry-col-patient">
+                        <a href="{% sort_url 'patient' %}"
+                           hx-get="{% sort_url 'patient' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'patient' %} is-active{% endif %}">
+                            <span>{% translate "Patient" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'patient' %}</span>
+                        </a>
+                    </th>
+                    <th class="visit-registry-col-doctor">
+                        <a href="{% sort_url 'doctor' %}"
+                           hx-get="{% sort_url 'doctor' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'doctor' %} is-active{% endif %}">
+                            <span>{% translate "Doctor" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'doctor' %}</span>
+                        </a>
+                    </th>
+                    <th class="visit-registry-col-date">
+                        <a href="{% sort_url 'date' %}"
+                           hx-get="{% sort_url 'date' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'date' %} is-active{% endif %}">
+                            <span>{% translate "Date and time" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'date' %}</span>
+                        </a>
+                    </th>
+                    <th class="visit-registry-col-state">{% translate "Status" %}</th>
+                    <th class="visit-registry-col-floor">{% translate "Floor" %}</th>
+                    <th class="visit-registry-col-finance text-end">{% translate "Billed" %}</th>
+                    <th class="visit-registry-col-finance text-end">{% translate "Due" %}</th>
+                    <th class="visit-registry-col-actions text-end">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                {% include 'core/partials/visit_list_row.html' with visit=visit %}
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="workspace-empty-state table-empty-cell patient-registry-empty-cell" data-ui="visit-list-empty">
+                        {% translate "No visits match these filters. Change the search or create a visit." %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="workspace-footer patient-registry-footer visit-registry-footer" data-ui="visit-list-pagination">
+        <p class="workspace-footer-text patient-registry-footer-text">
+            {% translate "Showing" %} {{ visits|length }} {% translate "of" %} {{ page_obj.paginator.count }}
+        </p>
+        <div class="workspace-pagination patient-registry-pagination" aria-label="{% translate 'Pagination' %}">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn"
+                aria-label="{% translate 'Previous page' %}">
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn">
+                {{ page_obj.previous_page_number }}
+            </a>
+            {% else %}
+            <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </span>
+            {% endif %}
+
+            <span class="workspace-page-btn patient-registry-page-btn is-current" aria-current="page">
+                {{ page_obj.number }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn">
+                {{ page_obj.next_page_number }}
+            </a>
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.doctor %}&doctor={{ request.GET.doctor }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn"
+                aria-label="{% translate 'Next page' %}">
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+            </a>
+            {% else %}
+            <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>

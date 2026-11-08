@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Accounting" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="accountant-dashboard-shell">
+<div class="page-header-bar" data-ui="accountant-dashboard-toolbar">
+    <h1 class="page-heading">{% translate "Accounting" %}</h1>
+    {% include 'core/partials/period_filter.html' %}
+</div>
+
+<div class="stats-grid-auto" data-ui="accountant-dashboard-summary">
+    <div class="stat-card stat-card-success text-center">
+        <div class="stat-label">{% translate "Settled payments" %}</div>
+        <div class="stat-value">{{ money.settled_payments }}</div>
+    </div>
+    <div class="stat-card text-center">
+        <div class="stat-label">{% translate "Refunds" %}</div>
+        <div class="stat-value">{{ money.refunds }}</div>
+    </div>
+    <div class="stat-card stat-card-primary text-center">
+        <div class="stat-label">{% translate "Net collected" %}</div>
+        <div class="stat-value">{{ money.net_collected }}</div>
+    </div>
+    <div class="stat-card text-center">
+        <div class="stat-label">{% translate "Outstanding balance" %}</div>
+        <div class="stat-value">{{ outstanding }}</div>
+    </div>
+</div>
+
+<div class="panel-grid-2 surface-top" data-ui="accountant-dashboard-results">
+    <div class="card-core card-fill-height">
+        <div class="card-header"><h2 class="panel-title">{% translate "By payment method" %}</h2></div>
+        <div class="card-body">
+            <table class="table-core">
+                <thead><tr><th>{% translate "Method" %}</th><th>{% translate "Kind" %}</th><th class="text-end">{% translate "Settled payments" %}</th><th class="text-end">{% translate "Refunds" %}</th><th class="text-end">{% translate "Net" %}</th></tr></thead>
+                <tbody>
+                    {% for row in money.rows %}
+                    <tr>
+                        <td>{{ row.label }}</td>
+                        <td>{{ row.kind }}</td>
+                        <td class="text-end">{{ row.payments }} <span class="table-meta-text">({{ row.payment_count }})</span></td>
+                        <td class="text-end">{{ row.refunds }} <span class="table-meta-text">({{ row.refund_count }})</span></td>
+                        <td class="text-end table-cell-strong">{{ row.net }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="table-empty-cell">{% translate "No payment methods configured." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-core card-fill-height">
+        <div class="card-header card-header-between">
+            <h2 class="panel-title">{% translate "Clinic expenses" %}</h2>
+            {% if perms.core.add_expense %}<a href="{% url 'expense_create' %}" class="btn-core btn-secondary btn-compact">+ {% translate "New expense" %}</a>{% endif %}
+        </div>
+        <div class="card-body">
+            <table class="table-core">
+                <tbody>
+                    <tr><td>{% translate "Manual expenses" %}</td><td class="text-end table-cell-strong">{{ expenses.manual }}</td></tr>
+                    <tr><td>{% translate "Automatic medicine expenses" %}</td><td class="text-end table-cell-strong">{{ expenses.automatic }}</td></tr>
+                    <tr><td>{% translate "All expenses" %}</td><td class="text-end table-cell-strong">{{ expenses.all }}</td></tr>
+                </tbody>
+            </table>
+            <h3 class="panel-title surface-top">{% translate "Manual expenses by category" %}</h3>
+            <table class="table-core">
+                <thead><tr><th>{% translate "Category" %}</th><th class="text-end">{% translate "Total" %}</th></tr></thead>
+                <tbody>
+                    {% for row in expenses.manual_by_category %}
+                    <tr><td>{{ row.category__name }}</td><td class="text-end table-cell-strong">{{ row.total }}</td></tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="table-empty-cell">{% translate "No manual expenses in this period." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-core card-fill-height">
+        <div class="card-header"><h2 class="panel-title">{% translate "Collected by doctor" %}</h2></div>
+        <div class="card-body">
+            <table class="table-core">
+                <thead><tr><th>{% translate "Doctor" %}</th><th class="text-end">{% translate "Collected on assigned visits" %}</th></tr></thead>
+                <tbody>
+                    {% for row in by_doctor %}
+                    <tr><td>{{ row.label }}</td><td class="text-end table-cell-strong">{{ row.collected }}</td></tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="table-empty-cell">{% translate "No settled money in this period." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-core card-fill-height">
+        <div class="card-header"><h2 class="panel-title">{% translate "Shifts" %}</h2></div>
+        <div class="card-body">
+            {% for row in shifts.open %}
+            <h3 class="panel-title">{% translate "Open now" %} — {{ row.shift.get_floor_display }}</h3>
+            <table class="table-core">
+                <tbody>
+                    <tr><td>{% translate "Payments" %}</td><td class="text-end table-cell-strong">{{ row.totals.payments }}</td></tr>
+                    <tr><td>{% translate "Refunds" %}</td><td class="text-end table-cell-strong">{{ row.totals.refunds }}</td></tr>
+                    <tr><td>{% translate "Manual expenses" %}</td><td class="text-end table-cell-strong">{{ row.totals.manual_expenses }}</td></tr>
+                    <tr><td>{% translate "Expected cash" %}</td><td class="text-end table-cell-strong">{{ row.totals.expected_cash }}</td></tr>
+                </tbody>
+            </table>
+            {% endfor %}
+            <h3 class="panel-title">{% translate "Closed shifts in this period (frozen figures)" %}</h3>
+            <div class="table-responsive">
+                <table class="table-core">
+                    <thead><tr><th>{% translate "Floor" %}</th><th>{% translate "Opened" %}</th><th class="text-end">{% translate "Visits" %}</th><th class="text-end">{% translate "Payments" %}</th><th class="text-end">{% translate "Refunds" %}</th><th class="text-end">{% translate "Manual expenses" %}</th><th class="text-end">{% translate "Expected cash" %}</th><th class="text-end">{% translate "Difference" %}</th></tr></thead>
+                    <tbody>
+                        {% for row in shifts.closed %}
+                        <tr>
+                            <td>{{ row.shift.get_floor_display }}</td>
+                            <td>{{ row.shift.opened_at|en_date }}</td>
+                            <td class="text-end">{{ row.totals.visits }}</td>
+                            <td class="text-end">{{ row.totals.payments }}</td>
+                            <td class="text-end">{{ row.totals.refunds }}</td>
+                            <td class="text-end">{{ row.totals.manual_expenses }}</td>
+                            <td class="text-end">{{ row.totals.expected_cash }}</td>
+                            <td class="text-end table-cell-strong">{{ row.totals.difference }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="8" class="table-empty-cell">{% translate "No closed shifts in this period." %}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

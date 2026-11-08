@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Adjust stock" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="stock-adjustment-shell">
+    <div class="form-back-row">
+        <a href="{% url 'inventory:stock_list' %}" class="form-back-link">← {% translate "Back to stock" %}</a>
+    </div>
+    <h1 class="form-title">{% translate "Adjust stock" %}: {{ consumable.name }}</h1>
+    <div class="card-core" data-ui="stock-adjustment-levels">
+        <div class="card-header">{% translate "Current stock" %}</div>
+        <div class="card-body card-body-flush">
+            <table class="table-core">
+                <thead><tr><th>{% translate "Location" %}</th><th class="text-end">{% translate "Quantity" %}</th></tr></thead>
+                <tbody>
+                    {% for stock in stock_rows %}
+                    <tr><td>{{ stock.location }}</td><td class="text-end table-cell-strong">{{ stock.quantity }}</td></tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="table-empty-cell">{% translate "No stock rows yet." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-core surface-top" data-ui="stock-adjustment-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions">
+                    <a href="{% url 'inventory:stock_list' %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-primary">{% translate "Apply" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

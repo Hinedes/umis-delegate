@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Stock" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="inventory-list-shell">
+<div class="page-header-bar" data-ui="inventory-list-toolbar">
+    <h1 class="page-heading">{% translate "Medicine stock" %}</h1>
+    <form method="get" class="page-header-actions filter-inline-form">
+        <span class="text-subtle">{% translate "Floor:" %}</span>
+        <button type="submit" name="floor" value="" class="btn-core {% if not current_floor %}btn-primary{% else %}btn-secondary{% endif %}">{% translate "All" %}</button>
+        {% for code, label in floor_choices %}
+        <button type="submit" name="floor" value="{{ code }}" class="btn-core {% if code == current_floor %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }}</button>
+        {% endfor %}
+        {% if perms.inventory.manage_inventory %}
+        <a href="{% url 'inventory:consumable_create' %}" class="btn-core btn-primary">+ {% translate "New consumable" %}</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card-core" data-ui="inventory-list-results">
+    <div class="card-body card-body-flush table-scroll">
+        <table class="table-core">
+            <thead>
+                <tr>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "SKU" %}</th>
+                    <th>{% translate "Stock" %}</th>
+                    <th>{% translate "Status" %}</th>
+                    <th class="text-end">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consumable in page_obj %}
+                <tr{% if not consumable.active %} class="row-faded"{% endif %}>
+                    <td class="table-cell-strong">{{ consumable.name }}</td>
+                    <td class="table-meta-text">{{ consumable.sku|default:"-" }}</td>
+                    <td>
+                        {% for stock in consumable.stock_levels.all %}
+                        <span class="badge-core badge-mbank">{{ stock.location }}: {{ stock.quantity }}</span>
+                        {% empty %}
+                        <span class="text-subtle">{% translate "No stock rows" %}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if consumable.active %}
+                        <span class="badge-core status-completed">{% translate "Active" %}</span>
+                        {% else %}
+                        <span class="badge-core status-cancelled">{% translate "Inactive" %}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if perms.inventory.manage_inventory %}
+                        <div class="table-actions">
+                            <a href="{% url 'inventory:consumable_edit' consumable.pk %}" class="btn-core btn-secondary btn-compact">{% translate "Edit" %}</a>
+                            <a href="{% url 'inventory:stock_adjustment' consumable.pk %}" class="btn-core btn-secondary btn-compact">{% translate "Adjust" %}</a>
+                            <form method="post" action="{% url 'inventory:consumable_toggle_active' consumable.pk %}" class="action-form-reset action-form-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-core btn-compact {% if consumable.active %}btn-danger{% else %}btn-primary{% endif %}">{% if consumable.active %}{% translate "Deactivate" %}{% else %}{% translate "Activate" %}{% endif %}</button>
+                            </form>
+                            <form method="post" action="{% url 'inventory:consumable_delete' consumable.pk %}" class="action-form-reset action-form-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-core btn-danger btn-compact" onclick="return confirm('Delete this consumable?');">{% translate "Delete" %}</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="table-empty-cell" data-ui="inventory-list-empty">{% translate "No consumables found." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if current_floor %}{% with qs="&floor="|add:current_floor %}{% include 'core/partials/pager.html' %}{% endwith %}{% else %}{% include 'core/partials/pager.html' %}{% endif %}
+</div>
+{% endblock %}

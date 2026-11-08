@@ -1,0 +1,11 @@
+<div class="workspace-hero">
+    <div class="workspace-heading-block">
+        {% if action_url %}
+        <a href="{{ action_url }}" class="workspace-primary-action table-link table-link-muted">
+            {% if action_icon %}<span class="material-symbols-outlined" aria-hidden="true">{{ action_icon }}</span>{% endif %}
+            {{ action_label }}
+        </a>
+        {% endif %}
+        <h1 class="workspace-title">{{ title }}</h1>
+    </div>
+</div>

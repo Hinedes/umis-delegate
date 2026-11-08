@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Operations" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="operation-list-shell">
+<div class="page-header-bar">
+    <h1 class="page-heading">{% translate "Operations" %}</h1>
+</div>
+<div class="card-core" data-ui="operation-list-results">
+    <div class="card-header card-header-between">
+        <span><span class="material-symbols-outlined" aria-hidden="true">inventory_2</span> {% translate "Operations and consumables" %}</span>
+        <span class="card-header-meta">{{ operations|length }} {% translate "operations" %}</span>
+    </div>
+    <div class="card-body card-body-flush table-scroll">
+        <table class="table-core">
+            <thead>
+                <tr>
+                    <th>{% translate "Time" %}</th>
+                    <th>{% translate "Patient" %}</th>
+                    <th>{% translate "Floor" %}</th>
+                    <th>{% translate "Type" %}</th>
+                    <th>{% translate "Consumables" %}</th>
+                    <th>{% translate "Log usage" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for operation in operations %}
+                <tr>
+                    <td>
+                        <div class="table-cell-strong text-nowrap">{{ operation.operation_datetime|en_date:"j M Y" }}</div>
+                        <div class="table-meta-text">{{ operation.operation_datetime|date:"H:i" }}</div>
+                    </td>
+                    <td class="table-cell-strong">{{ operation.patient.full_name }}</td>
+                    <td><span class="badge-core badge-mbank">{{ operation.get_floor_display|default:operation.floor }}</span></td>
+                    <td>{{ operation.operation_type }}</td>
+                    <td>
+                        {% for usage in operation.consumables.all %}
+                        <span class="badge-core status-completed">{{ usage.consumable.name }} ×{{ usage.quantity }}</span>
+                        {% empty %}
+                        <span class="text-subtle">-</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if perms.core.add_operationconsumable %}
+                        <form method="post" action="{% url 'operation_add_consumable' operation.pk %}" class="filter-inline-form">
+                            {% csrf_token %}
+                            <select name="consumable" class="form-control-core form-control-inline" aria-label="{% translate 'Consumable' %}">
+                                {% for consumable in consumables %}
+                                <option value="{{ consumable.pk }}">{{ consumable.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="number" name="quantity" value="1" min="1" step="1" class="form-control-core form-control-inline" aria-label="{% translate 'Quantity' %}">
+                            <input type="text" name="notes" placeholder="{% translate 'Notes' %}" class="form-control-core form-control-inline">
+                            <button type="submit" class="btn-core btn-primary btn-compact">{% translate "Log" %}</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty-cell table-empty-cell-lg">{% translate "No operations." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

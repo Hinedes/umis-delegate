@@ -1,0 +1,18 @@
+{% load i18n %}
+<div class="modal fade" id="sessionModal" tabindex="-1" aria-labelledby="session-title" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="session-title">{% translate "Session expiring" %}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
+            </div>
+            <div class="modal-body">
+                {% translate "Your session will expire soon. Stay signed in to continue your work." %}
+                <p id="session-error" role="alert" hidden>{% translate "Could not extend your session. Check your connection and try again." %}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-core btn-primary" id="staySignedInBtn">{% translate "Stay signed in" %}</button>
+            </div>
+        </div>
+    </div>
+</div>

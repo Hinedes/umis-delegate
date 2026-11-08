@@ -1,0 +1,177 @@
+{% load sorting_tags i18n %}
+
+<form method="get"
+      class="workspace-tray patient-registry-filter-tray patient-list-filter"
+      data-ui="patient-list-filters"
+      hx-get="{{ request.path }}"
+      hx-target="#registry-workspace-container"
+      hx-select="#registry-workspace-container"
+      hx-select-oob="#messages-container"
+      hx-swap="outerHTML"
+      hx-push-url="true">
+    <div class="workspace-tray-copy patient-registry-filter-copy">
+        <span class="material-symbols-outlined patient-registry-filter-icon" aria-hidden="true">filter_alt</span>
+        <span class="workspace-tray-label patient-registry-filter-label">{% translate "Floor:" %}</span>
+    </div>
+    <div class="workspace-tab-group patient-registry-filter-group" role="group" aria-label="{% translate 'Filter by floor' %}">
+        <button type="submit"
+                name="floor"
+                value=""
+                class="workspace-tab-link patient-registry-filter-button{% if not current_floor %} is-active{% endif %}">
+            {% translate "All floors" %}
+        </button>
+        {% for value, label in floor_choices %}
+        <button type="submit" name="floor" value="{{ value }}" class="workspace-tab-link patient-registry-filter-button{% if current_floor == value %} is-active{% endif %}">{{ label }}</button>
+        {% endfor %}
+    </div>
+    {% if search_query %}
+    <input type="hidden" name="search" value="{{ search_query }}">
+    {% endif %}
+    {% if current_sort %}
+    <input type="hidden" name="sort" value="{{ current_sort }}">
+    <input type="hidden" name="dir" value="{{ current_dir }}">
+    {% endif %}
+</form>
+
+<div class="workspace-panel patient-registry-card" data-ui="patient-list-results">
+    <div class="workspace-scroll-region patient-registry-table-scroll" tabindex="0" role="region" aria-label="{% translate 'Patient results' %}">
+        <table class="patient-registry-table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{% sort_url 'name' %}"
+                           hx-get="{% sort_url 'name' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'name' %} is-active{% endif %}">
+                            <span>{% translate "Full name" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'name' %}</span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{% sort_url 'national_id' %}"
+                           hx-get="{% sort_url 'national_id' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'national_id' %} is-active{% endif %}">
+                            <span>{% translate "National ID or passport" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'national_id' %}</span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{% sort_url 'phone' %}"
+                           hx-get="{% sort_url 'phone' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'phone' %} is-active{% endif %}">
+                            <span>{% translate "Phone" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'phone' %}</span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{% sort_url 'birth_date' %}"
+                           hx-get="{% sort_url 'birth_date' %}"
+                           hx-target="#registry-workspace-container"
+                           hx-select="#registry-workspace-container"
+                           hx-select-oob="#messages-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="patient-registry-sort-link{% if current_sort == 'birth_date' %} is-active{% endif %}">
+                            <span>{% translate "Date of birth" %}</span>
+                            <span class="patient-registry-sort-icon" aria-hidden="true">{% sort_icon 'birth_date' %}</span>
+                        </a>
+                    </th>
+                    <th>{% translate "Floor" %}</th>
+                    <th class="text-end">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                {% include 'core/partials/patient_list_row.html' with patient=patient %}
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="workspace-empty-state table-empty-cell patient-registry-empty-cell" data-ui="patient-list-empty">
+                        {% translate "No patients match these filters. Change the search or add a patient." %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="workspace-footer patient-registry-footer" data-ui="patient-list-pagination">
+        <p class="workspace-footer-text patient-registry-footer-text">
+            {% translate "Showing" %} {{ patients|length }} {% translate "of" %} {{ page_obj.paginator.count }}
+        </p>
+        <div class="workspace-pagination patient-registry-pagination" aria-label="{% translate 'Pagination' %}">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.previous_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn"
+                aria-label="{% translate 'Previous page' %}">
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.previous_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn">
+                {{ page_obj.previous_page_number }}
+            </a>
+            {% else %}
+            <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </span>
+            {% endif %}
+
+            <span class="workspace-page-btn patient-registry-page-btn is-current" aria-current="page">
+                {{ page_obj.number }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.next_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn">
+                {{ page_obj.next_page_number }}
+            </a>
+            <a href="?page={{ page_obj.next_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-get="?page={{ page_obj.next_page_number }}{% if current_floor %}&floor={{ current_floor }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if current_sort %}&sort={{ current_sort }}&dir={{ current_dir }}{% endif %}"
+               hx-target="#registry-workspace-container"
+               hx-select="#registry-workspace-container"
+               hx-select-oob="#messages-container"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               class="workspace-page-btn patient-registry-page-btn"
+                aria-label="{% translate 'Next page' %}">
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+            </a>
+            {% else %}
+            <span class="workspace-page-btn patient-registry-page-btn is-disabled" aria-hidden="true">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>

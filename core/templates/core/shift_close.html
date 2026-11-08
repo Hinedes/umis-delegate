@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Close shift" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="shift-close-shell">
+    <div class="form-back-row">
+        <a href="{% url 'shift_list' %}" class="form-back-link">← {% translate "Back to shifts" %}</a>
+    </div>
+    <h1 class="form-title">{% translate "Close shift" %}: {{ shift.get_floor_display }}</h1>
+    <div class="card-core" data-ui="shift-close-summary">
+        <div class="card-header">{% translate "Cash summary" %}</div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <span class="detail-label">{% translate "Opening cash" %}</span>
+                <span class="detail-value">{{ shift.opening_cash }}</span>
+                <span class="detail-label">{% translate "Cash in" %}</span>
+                <span class="detail-value detail-value-success">{{ totals.cash_in }}</span>
+                <span class="detail-label">{% translate "Cash refunds" %}</span>
+                <span class="detail-value">{{ totals.cash_refund }}</span>
+                <span class="detail-label">{% translate "Cash expenses" %}</span>
+                <span class="detail-value">{{ totals.cash_expenses }}</span>
+                <span class="detail-label">{% translate "Expected cash" %}</span>
+                <span class="detail-value">{{ expected_cash }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-core surface-top" data-ui="shift-close-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions">
+                    <a href="{% url 'shift_list' %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-warning">{% translate "Close shift" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

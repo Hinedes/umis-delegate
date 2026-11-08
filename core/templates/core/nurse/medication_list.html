@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Medications" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="medication-list-shell">
+<div class="page-header-bar">
+    <h1 class="page-heading">{% translate "Medications" %}</h1>
+    {% if perms.core.add_medicationorder %}
+    <div class="page-header-actions">
+        <a href="{% url 'medication_order_create' %}" class="btn-core btn-core-lg btn-primary">+ {% translate "New prescription" %}</a>
+    </div>
+    {% endif %}
+</div>
+
+{% for order in orders %}
+<div class="card-core surface-top" data-ui="medication-order">
+    <div class="card-header card-header-between">
+        <span>{{ order.visit.patient.full_name }} — {{ order.consumable.name }}</span>
+        <span class="card-header-meta">{% translate "Prescribed by" %} {{ order.prescribed_by }}</span>
+    </div>
+    <div class="card-body">
+        <div class="detail-grid">
+            <span class="detail-label">{% translate "Ordered" %}</span>
+            <span class="detail-value">{{ order.total_quantity }}</span>
+            <span class="detail-label">{% translate "Given" %}</span>
+            <span class="detail-value detail-value-success">{{ order.administered_quantity }}</span>
+            <span class="detail-label">{% translate "Remaining" %}</span>
+            <span class="detail-value">{{ order.remaining_quantity }}</span>
+        </div>
+
+        <div class="form-actions">
+            {% if perms.core.add_medicationadministration %}
+            <form method="post" action="{% url 'medication_administer' order.pk %}" class="filter-inline-form">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="1" min="1" step="1" class="form-control-core form-control-inline" aria-label="{% translate 'Quantity' %}">
+                <button type="submit" class="btn-core btn-primary">{% translate "Administer" %}</button>
+            </form>
+            {% endif %}
+            {% if perms.core.change_medicationorder %}
+            <form method="post" action="{% url 'medication_order_cancel' order.pk %}" class="filter-inline-form">
+                {% csrf_token %}
+                <input type="text" name="reason" placeholder="{% translate 'Reason' %}" class="form-control-core form-control-inline">
+                <button type="submit" class="btn-core btn-warning">{% translate "Cancel order" %}</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <table class="table-core surface-top">
+            <thead><tr><th>{% translate "Administered at" %}</th><th>{% translate "Quantity" %}</th><th></th></tr></thead>
+            <tbody>
+                {% for administration in order.administrations.all %}
+                <tr{% if administration.is_voided %} class="row-faded"{% endif %}>
+                    <td>{{ administration.administered_at|en_date }}</td>
+                    <td class="table-cell-strong">{{ administration.quantity_given }}</td>
+                    <td class="text-end">
+                        {% if administration.is_voided %}
+                        <span class="badge-core status-cancelled">{% translate "voided" %}</span> <span class="table-meta-text">{{ administration.void_reason }}</span>
+                        {% elif perms.core.change_medicationadministration %}
+                        <form method="post" action="{% url 'medication_void' administration.pk %}" class="filter-inline-form">
+                            {% csrf_token %}
+                            <input type="text" name="reason" placeholder="{% translate 'Reason' %}" class="form-control-core form-control-inline">
+                            <button type="submit" class="btn-core btn-secondary btn-compact">{% translate "Void" %}</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="table-empty-cell">{% translate "No administrations." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% empty %}
+<div class="card-core surface-top">
+    <div class="card-body"><p class="text-subtle mb-0">{% translate "No active prescriptions." %}</p></div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

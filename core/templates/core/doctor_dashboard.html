@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "My day" %} · {{ SITE_NAME }}{% endblock %}
+{% block content_classes %}dashboard-canvas{% endblock %}
+
+{% block content %}
+<div class="doctor-dashboard">
+    <header class="doctor-dashboard__toolbar" data-ui="doctor-dashboard-toolbar">
+        <div class="doctor-dashboard__toolbar-copy">
+            <h1 class="doctor-dashboard__title">{% translate "Clinical shift" %}</h1>
+            <p class="doctor-dashboard__subtitle">{% now "l, j F Y" %} | {% translate "On duty:" %} {{ duty_open_hour|stringformat:"02d" }}:00 — {{ duty_close_hour|stringformat:"02d" }}:00</p>
+        </div>
+        {% if perms.core.add_medicationorder %}
+        <a href="{% url 'medication_order_create' %}" class="btn-core btn-core-lg btn-primary" hx-boost="false">{% translate "Prescribe medication" %}</a>
+        {% endif %}
+    </header>
+
+    {% if pending_visits %}
+    <section class="doctor-feed__section" aria-labelledby="pending-requests-heading">
+        <div class="doctor-feed__section-label doctor-feed__section-label--queue">
+            <span class="doctor-feed__section-dot" aria-hidden="true"></span>
+            <span id="pending-requests-heading">
+                {% translate "Pending requests" %} ({{ pending_visits|length }})
+            </span>
+        </div>
+
+        <div class="doctor-feed__list">
+            {% for visit in pending_visits %}
+            <article class="doctor-feed-card doctor-feed-card--live">
+                <div class="doctor-feed-card__identity">
+                    <div class="doctor-feed-card__avatar doctor-feed-card__avatar--queue" aria-hidden="true">
+                        {{ visit.patient.full_name|slice:":1"|upper }}
+                    </div>
+                    <div class="doctor-feed-card__copy">
+                        <a href="{% url 'visit_detail' visit.pk %}" class="doctor-feed-card__name">
+                            {{ visit.patient.full_name }}
+                        </a>
+                        <p class="doctor-feed-card__meta">
+                            {{ visit.visit_datetime|en_date }}
+                            · {{ visit.get_visit_type_display }}
+                            · {{ visit.get_floor_display }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="doctor-feed-card__aside">
+                    <form method="post"
+                          action="{% url 'visit_accept_request' visit.pk %}"
+                          class="action-form-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-core btn-primary">
+                            {% translate "Accept" %}
+                        </button>
+                    </form>
+
+                    {% blocktranslate with pk=visit.pk patient=visit.patient.full_name asvar decline_goal %}
+                    Decline the visit request #{{ pk }} for {{ patient }}. Do not cancel it without my approval.
+                    {% endblocktranslate %}
+                    <form method="post" action="{% url 'control_start' %}" class="action-form-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="goal" value="{{ decline_goal }}">
+                        <button type="submit" class="btn-core btn-secondary">
+                            {% translate "Decline with assistant" %}
+                        </button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="doctor-dashboard__grid">
+        <section class="doctor-dashboard__primary" aria-label="{% translate 'Operational feed' %}">
+            <div class="doctor-feed">
+                <div class="doctor-feed__header">
+                    <h2 class="doctor-feed__title">{% translate "Operational feed" %}</h2>
+                    <a href="{% url 'visit_list' %}" class="doctor-feed__link">{% translate "Visit registry" %}</a>
+                </div>
+
+                <section class="doctor-feed__section" aria-labelledby="feed-now-heading">
+                    <div class="doctor-feed__section-label doctor-feed__section-label--live">
+                        <span class="doctor-feed__section-dot" aria-hidden="true"></span>
+                        <span id="feed-now-heading">{% translate "Now" %}</span>
+                    </div>
+
+                    <div class="doctor-feed__list">
+                        {% for visit in active_visits %}
+                        <article class="doctor-feed-card doctor-feed-card--live">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--live" aria-hidden="true">
+                                    {{ visit.patient.full_name|slice:":1"|upper }}
+                                </div>
+                                <div class="doctor-feed-card__copy">
+                                    <a href="{% url 'visit_detail' visit.pk %}" class="doctor-feed-card__name">
+                                        {{ visit.patient.full_name }}
+                                    </a>
+                                    <p class="doctor-feed-card__meta">
+                                        {{ visit.visit_datetime|en_date }}
+                                        · {{ visit.get_visit_type_display }}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="doctor-feed-card__status doctor-feed-card__status--live">
+                                {% translate "In progress" %}
+                            </p>
+                        </article>
+                        {% empty %}
+                        <article class="doctor-feed-card doctor-feed-card--live doctor-feed-card--empty">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--ghost" aria-hidden="true">—</div>
+                                <div class="doctor-feed-card__copy">
+                                    <p class="doctor-feed-card__name">{% translate "No active visits" %}</p>
+                                    <p class="doctor-feed-card__meta">
+                                        {% translate "The patient you are seeing will appear here." %}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="doctor-feed-card__status doctor-feed-card__status--ghost">
+                                {% translate "Clear" %}
+                            </p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="doctor-feed__section" aria-labelledby="feed-waiting-heading">
+                    <div class="doctor-feed__section-label doctor-feed__section-label--queue">
+                        <span class="doctor-feed__section-dot" aria-hidden="true"></span>
+                        <span id="feed-waiting-heading">
+                            {% translate "Waiting" %} ({{ waiting_visits|length }})
+                        </span>
+                    </div>
+
+                    <div class="doctor-feed__list">
+                        {% for visit in waiting_visits %}
+                        <article class="doctor-feed-card">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--queue" aria-hidden="true">
+                                    {{ visit.patient.full_name|slice:":1"|upper }}
+                                </div>
+                                <div class="doctor-feed-card__copy">
+                                    <a href="{% url 'visit_detail' visit.pk %}" class="doctor-feed-card__name">
+                                        {{ visit.patient.full_name }}
+                                    </a>
+                                    <p class="doctor-feed-card__meta">
+                                        {{ visit.visit_datetime|en_date }}
+                                        · {{ visit.get_floor_display }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="doctor-feed-card__aside">
+                                {% if forloop.first %}
+                                <form method="post" action="{% url 'visit_status_update' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="visit_id" value="{{ visit.pk }}">
+                                    <input type="hidden" name="action" value="start">
+                                    <button type="submit" class="doctor-feed-card__cta">
+                                        {% translate "Call in" %}
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="doctor-feed-card__status doctor-feed-card__status--muted">
+                                    {% translate "Waiting" %}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </article>
+                        {% empty %}
+                        <article class="doctor-feed-card doctor-feed-card--empty">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--ghost" aria-hidden="true">—</div>
+                                <div class="doctor-feed-card__copy">
+                                    <p class="doctor-feed-card__name">{% translate "Nobody in the queue" %}</p>
+                                    <p class="doctor-feed-card__meta">
+                                        {% translate "New arrivals will appear here automatically." %}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="doctor-feed-card__status doctor-feed-card__status--ghost">
+                                {% translate "Queue empty" %}
+                            </p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="doctor-feed__section doctor-feed__section--muted" aria-labelledby="feed-next-heading">
+                    <div class="doctor-feed__section-label doctor-feed__section-label--muted">
+                        <span class="doctor-feed__section-dot" aria-hidden="true"></span>
+                        <span id="feed-next-heading">{% translate "Next" %}</span>
+                    </div>
+
+                    <div class="doctor-feed__list">
+                        {% for visit in upcoming_visits %}
+                        <article class="doctor-feed-card doctor-feed-card--muted">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--muted" aria-hidden="true">
+                                    {{ visit.patient.full_name|slice:":1"|upper }}
+                                </div>
+                                <div class="doctor-feed-card__copy">
+                                    <a href="{% url 'visit_detail' visit.pk %}" class="doctor-feed-card__name">
+                                        {{ visit.patient.full_name }}
+                                    </a>
+                                    <p class="doctor-feed-card__meta">
+                                        {{ visit.visit_datetime|en_date }}
+                                        · {{ visit.get_visit_type_display }}
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="doctor-feed-card__status doctor-feed-card__status--muted">
+                                {{ visit.visit_datetime|en_date:"D, j M" }}
+                            </span>
+                        </article>
+                        {% empty %}
+                        <article class="doctor-feed-card doctor-feed-card--empty">
+                            <div class="doctor-feed-card__identity">
+                                <div class="doctor-feed-card__avatar doctor-feed-card__avatar--ghost" aria-hidden="true">—</div>
+                                <div class="doctor-feed-card__copy">
+                                    <p class="doctor-feed-card__name">{% translate "No scheduled visits" %}</p>
+                                    <p class="doctor-feed-card__meta">
+                                        {% translate "The rest of the day is open." %}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="doctor-feed-card__status doctor-feed-card__status--ghost">
+                                {% translate "Open" %}
+                            </p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <aside class="doctor-dashboard__secondary">
+            <section class="doctor-focus-card">
+                {% if focus_visit %}
+                <div class="doctor-focus-card__header">
+                    <div class="doctor-focus-card__copy">
+                        <div class="doctor-focus-card__title-row">
+                            <h2 class="doctor-focus-card__name">{{ focus_visit.patient.full_name }}</h2>
+                            <span class="doctor-status-chip
+                                {% if focus_visit.status == 'IN_PROGRESS' %}doctor-status-chip--live
+                                {% elif focus_visit.status == 'WAITING' %}doctor-status-chip--queued
+                                {% else %}doctor-status-chip--planned{% endif %}">
+                                {{ focus_visit.get_status_display }}
+                            </span>
+                        </div>
+
+                        <p class="doctor-focus-card__meta">
+                            {% translate "Visit" %} #{{ focus_visit.pk }} · {{ focus_visit.patient.phone }}
+                        </p>
+
+                        <div class="doctor-focus-card__facts">
+                            <p class="doctor-focus-card__fact">
+                                <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                <span>{% translate "Time" %}</span>
+                                <span>{{ focus_visit.visit_datetime|en_date }}</span>
+                            </p>
+                            <p class="doctor-focus-card__fact">
+                                <span class="material-symbols-outlined" aria-hidden="true">meeting_room</span>
+                                <span>{% translate "Floor" %}</span>
+                                <span>{{ focus_visit.get_floor_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="doctor-focus-card__stats">
+                    <div class="doctor-focus-stat">
+                        <p class="doctor-focus-stat__label">{% translate "Visit type" %}</p>
+                        <p class="doctor-focus-stat__value">{{ focus_visit.get_visit_type_display }}</p>
+                    </div>
+                    <div class="doctor-focus-stat">
+                        <p class="doctor-focus-stat__label">{% translate "Status" %}</p>
+                        <p class="doctor-focus-stat__value">{{ focus_visit.get_status_display }}</p>
+                    </div>
+                </div>
+
+                <div class="doctor-focus-card__actions">
+                    {% if focus_visit.status == 'PLANNED' or focus_visit.status == 'WAITING' %}
+                    <form method="post" action="{% url 'visit_status_update' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="visit_id" value="{{ focus_visit.pk }}">
+                        <input type="hidden" name="action" value="start">
+                        <button type="submit" class="btn-core btn-core-lg btn-primary doctor-dashboard__action--block">
+                            {% translate "Start visit" %}
+                        </button>
+                    </form>
+                    {% elif focus_visit.status == 'IN_PROGRESS' %}
+                    <form method="post" action="{% url 'visit_status_update' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="visit_id" value="{{ focus_visit.pk }}">
+                        <input type="hidden" name="action" value="finish">
+                        <button type="submit" class="btn-core btn-core-lg btn-secondary doctor-dashboard__action--block">
+                            {% translate "Complete visit" %}
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="doctor-dashboard__action doctor-dashboard__action--disabled doctor-dashboard__action--block">
+                        {% translate "No action needed" %}
+                    </span>
+                    {% endif %}
+
+                    <a href="{% url 'visit_detail' focus_visit.pk %}"
+                       class="doctor-dashboard__action doctor-dashboard__action--surface doctor-dashboard__action--block">
+                        {% translate "Open visit record" %}
+                    </a>
+                </div>
+                {% else %}
+                <div class="doctor-focus-card__empty">
+                    <p class="doctor-focus-card__empty-kicker">{% translate "Shift is calm" %}</p>
+                    <h2 class="doctor-focus-card__empty-title">{% translate "No visits yet" %}</h2>
+                    <p class="doctor-focus-card__empty-copy">
+                        {% translate "The patient card appears here when there is an active, waiting, or scheduled visit." %}
+                    </p>
+                </div>
+
+                <div class="doctor-focus-card__stats">
+                    <div class="doctor-focus-stat">
+                        <p class="doctor-focus-stat__label">{% translate "Visit type" %}</p>
+                        <p class="doctor-focus-stat__value">—</p>
+                    </div>
+                    <div class="doctor-focus-stat">
+                        <p class="doctor-focus-stat__label">{% translate "Floor" %}</p>
+                        <p class="doctor-focus-stat__value">—</p>
+                    </div>
+                </div>
+
+                <div class="doctor-focus-card__actions">
+                    <span class="doctor-dashboard__action doctor-dashboard__action--disabled doctor-dashboard__action--block">
+                        {% translate "No visits right now" %}
+                    </span>
+                </div>
+                {% endif %}
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}

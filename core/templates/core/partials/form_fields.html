@@ -1,0 +1,15 @@
+{% load umis_ui %}
+{% if form.non_field_errors %}<div class="alert-core alert-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form.hidden_fields %}{{ field }}{% endfor %}
+{% for field in form.visible_fields %}
+<div class="form-group">
+    {% if field.widget_type == 'checkbox' %}
+    <label class="form-check-label">{{ field }} <span>{{ field.label }}</span></label>
+    {% else %}
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+    {{ field|fc_control }}
+    {% endif %}
+    {% if field.help_text %}<small class="form-help-text">{{ field.help_text }}</small>{% endif %}
+    {% if field.errors %}<div class="form-field-error">{{ field.errors.0 }}</div>{% endif %}
+</div>
+{% endfor %}

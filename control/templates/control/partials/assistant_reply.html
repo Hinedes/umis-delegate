@@ -1,0 +1,22 @@
+{% load i18n umis_ui %}
+<div class="assistant-turn is-agent">
+    <span class="assistant-who">{% translate "Agent" %}</span>
+    <div class="assistant-bubble">
+        {% if paused %}
+        <p>{% translate "The agent is paused by an administrator." %}</p>
+        {% elif run.status == 'AWAITING_APPROVAL' %}
+        <p>{{ preview.summary|default:_("A destructive step needs your approval.") }}</p>
+        <a href="{% url 'control_run_detail' run.pk %}" class="assistant-approve">{% translate "Review and approve" %} →</a>
+        {% elif error %}
+        <p>{{ error }}</p>
+        {% else %}
+        <p>{{ answer|plain_text|linebreaksbr }}</p>
+        {% endif %}
+    </div>
+    {% if run %}
+    <p class="assistant-meta">
+        {% include 'control/partials/outcome_badge.html' %}
+        <a href="{% url 'control_run_detail' run.pk %}">{% blocktranslate with pk=run.pk %}Run #{{ pk }}{% endblocktranslate %}</a>
+    </p>
+    {% endif %}
+</div>

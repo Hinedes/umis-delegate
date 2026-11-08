@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% if record %}{% translate "Edit medical record" %}{% else %}{% translate "New medical record" %}{% endif %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="medical-record-form-shell">
+    <div class="form-back-row">
+        <a href="{% url 'patient_detail' patient.pk %}" class="form-back-link">← {{ patient.full_name }}</a>
+    </div>
+    <h1 class="form-title">{% if record %}{% translate "Edit medical record" %}{% else %}{% translate "New medical record" %}{% endif %}</h1>
+    <div class="card-core" data-ui="medical-record-form-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions">
+                    <a href="{% url 'patient_detail' patient.pk %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-primary">{% translate "Save" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

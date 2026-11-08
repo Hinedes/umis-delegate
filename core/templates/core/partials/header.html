@@ -1,0 +1,26 @@
+{% load i18n %}
+<header id="app-header-shell" class="app-header"{% if oob_swap %} hx-swap-oob="outerHTML"{% endif %}>
+    <div class="header-left">
+        <button type="button" id="navigation-toggle" class="header-icon-btn navigation-toggle" aria-controls="app-sidebar-shell" aria-expanded="false">
+            <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+            <span>{% translate "Menu" %}</span>
+        </button>
+        <a href="{% url 'root' %}" class="header-brand">{{ SITE_NAME }}</a>
+    </div>
+    <div class="header-right">
+        {% if perms.core.view_patient %}
+        <form action="{% url 'patient_list' %}" method="get" class="header-search hidden lg:flex items-center">
+            <span class="header-search-icon material-symbols-outlined" aria-hidden="true">search</span>
+            <input type="search" name="search" value="{{ request.GET.search }}" placeholder="{% translate 'Search patients' %}" aria-label="{% translate 'Search patients' %}" class="header-search-input">
+        </form>
+        {% endif %}
+        <button type="button" id="sidebar-theme-toggle" class="sidebar-theme-btn header-icon-btn" aria-label="{% translate 'Toggle light and dark theme' %}" title="{% translate 'Toggle light and dark theme' %}" aria-pressed="{% if theme.color_scheme == 'dark' %}true{% else %}false{% endif %}">
+            <span class="btn-icon-sun material-symbols-outlined" aria-hidden="true">light_mode</span>
+            <span class="btn-icon-moon material-symbols-outlined" aria-hidden="true">dark_mode</span>
+        </button>
+        <form id="logout-form" action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="header-icon-btn" aria-label="{% translate 'Sign out' %}" title="{% translate 'Sign out' %}"><span class="material-symbols-outlined" aria-hidden="true">logout</span></button>
+        </form>
+    </div>
+</header>

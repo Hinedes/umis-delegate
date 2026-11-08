@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Agent run" %} #{{ run.pk }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-section-stack">
+    {% blocktranslate with pk=run.pk asvar page_title %}Run #{{ pk }}{% endblocktranslate %}
+    {% url 'control_panel' as action_url %}
+    {% translate "Back to assistant" as action_label %}
+    {% include 'core/partials/page_header.html' with title=page_title action_url=action_url action_label=action_label action_icon="arrow_back" %}
+
+    <section class="card-core">
+        <div class="card-header card-header-between">
+            <span>{% translate "Run overview" %}</span>
+            {% include 'control/partials/outcome_badge.html' %}
+        </div>
+        <div class="card-body">
+            <div class="approval-stats">
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Model" %}</span>
+                    <span class="approval-stat-value">{{ run.model|default:"-" }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Thinking effort" %}</span>
+                    <span class="approval-stat-value">{{ run_effort }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Created" %}</span>
+                    <span class="approval-stat-value">{{ run.created_at|en_date }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Steps" %}</span>
+                    <span class="approval-stat-value">{{ steps|length }}</span>
+                </div>
+            </div>
+            <p class="step-timeline-detail"><strong>{% translate "Goal" %}:</strong> {{ run.goal }}</p>
+            <p class="step-timeline-detail"><a href="#audit-receipt" class="table-link table-link-primary">{% translate "View audit receipt" %} ↓</a></p>
+        </div>
+    </section>
+
+    {% if error %}
+    <div class="alert-core alert-error" role="alert">
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if answer %}
+    <section class="card-core">
+        <div class="card-header">{% translate "Agent answer" %}</div>
+        <div class="card-body">
+            <p>{{ answer|plain_text|linebreaksbr }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if pending_approval %}
+    <section class="card-core approval-card" aria-labelledby="approval-heading">
+        <div class="card-header card-header-warning card-header-between">
+            <span id="approval-heading">{% translate "Approval required" %}</span>
+            <span class="badge-core status-badge status-pending">{% translate "Awaiting approval" %}</span>
+        </div>
+        <div class="card-body">
+            {% if pending_approval.preview.summary %}
+            <p class="doctor-feed-card__meta">{{ pending_approval.preview.summary }}</p>
+            {% else %}
+            <p class="doctor-feed-card__meta">{% translate "This command needs your confirmation before it runs." %}</p>
+            {% endif %}
+
+            <div class="approval-stats">
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Affected records" %}</span>
+                    <span class="approval-stat-value">{{ pending_approval.preview.snapshot.affected|default:"1" }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Command" %}</span>
+                    <span class="approval-stat-value">{{ pending_approval.step.command }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Risk" %}</span>
+                    <span class="approval-stat-value">{{ pending_approval.preview.risk|default:"high" }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Expires" %}</span>
+                    <span class="approval-stat-value">{{ pending_approval.expires_at|en_date }}</span>
+                </div>
+            </div>
+
+            <details>
+                <summary>{% translate "Preview details" %}</summary>
+                <pre>{{ pending_approval.preview|pprint }}</pre>
+            </details>
+
+            <div class="approval-actions">
+                <form method="post"
+                      action="{% url 'control_approval' run.pk pending_approval.pk 'confirm' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-core btn-core-lg btn-primary">
+                        {% translate "Approve" %}
+                    </button>
+                </form>
+                <form method="post"
+                      action="{% url 'control_approval' run.pk pending_approval.pk 'cancel' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-core btn-core-lg btn-secondary">
+                        {% translate "Reject" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="card-core">
+        <div class="card-header">{% translate "Plan and steps" %}</div>
+        <div class="card-body">
+            {% if steps %}
+            <ol class="step-timeline">
+                {% for step in steps %}
+                <li class="step-timeline-item{% if step.status == 'SUCCEEDED' %} is-succeeded{% elif step.status == 'DENIED' %} is-denied{% elif step.status == 'AWAITING_APPROVAL' %} is-awaiting{% endif %}">
+                    <span class="step-timeline-dot" aria-hidden="true"></span>
+                    <div class="step-timeline-row">
+                        <div class="step-timeline-main">
+                            <span class="step-timeline-code">{{ step.index }}. {{ step.command }}</span>
+                            {% with summary=step.result|short_result %}{% if summary %}<span class="step-timeline-detail">{{ summary }}</span>{% endif %}{% endwith %}
+                            {% if step.error %}
+                            <span class="step-timeline-detail step-timeline-reason"><strong>{% if step.status == 'DENIED' %}{% translate "Reason" %}{% else %}{% translate "Error" %}{% endif %}:</strong> {{ step.error }}</span>
+                            {% endif %}
+                            <details class="step-timeline-raw">
+                                <summary>{% translate "Arguments and raw result" %}</summary>
+                                <pre>{{ step.args|pprint }}</pre>
+                                <pre>{{ step.result|pprint }}</pre>
+                            </details>
+                        </div>
+                        <span class="badge-core status-badge {% if step.status == 'SUCCEEDED' %}status-completed{% elif step.status == 'DENIED' %}status-cancelled{% elif step.status == 'AWAITING_APPROVAL' %}status-pending{% else %}badge-neutral{% endif %}">{{ step.get_status_display }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+            {% else %}
+            <p class="empty-state-text">{% translate "No steps yet." %}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if transcript %}
+    <section class="card-core">
+        <div class="card-header">{% translate "Agent transcript" %}</div>
+        <div class="card-body">
+            <details>
+                <summary>{% translate "Show transcript" %}</summary>
+                <div class="form-section-stack">
+                    {% for message in transcript %}
+                    <div>
+                        <strong>{{ message.role }}</strong>
+                        {% if message.content %}<p class="step-timeline-detail">{{ message.content }}</p>{% endif %}
+                        {% if message.tool_calls %}
+                        <ul>
+                            {% for call in message.tool_calls %}
+                            <li><code>{{ call.function.name }}</code></li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </details>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="card-core" id="audit-receipt">
+        <div class="card-header card-header-between">
+            <span>{% translate "Audit receipt" %}</span>
+            {% if user.is_superuser or perms.core.view_auditlog %}
+            <a href="{% url 'control_audit' %}" class="btn-core btn-secondary btn-compact">{% translate "All agent activity" %}</a>
+            {% endif %}
+        </div>
+        {% if audit_events %}
+        <div class="card-body-flush patient-registry-table-scroll">
+            <table class="table-core">
+                <thead>
+                    <tr>
+                        <th>{% translate "When" %}</th>
+                        <th>{% translate "Action" %}</th>
+                        <th>{% translate "Description" %}</th>
+                        <th>{% translate "Metadata" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in audit_events %}
+                    <tr>
+                        <td>{{ event.created_at|en_date }}</td>
+                        <td>{{ event.get_action_display }}</td>
+                        <td>{{ event.description }}</td>
+                        <td><code>{{ event.metadata }}</code></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card-body">
+            <p class="empty-state-text">{% translate "No agent audit events for this run yet." %}</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% if service %}{% translate "Edit service" %}{% else %}{% translate "New service" %}{% endif %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div id="serviceFormPage" hx-get="{{ request.get_full_path }}" hx-trigger="serviceListChanged from:body" hx-select="#serviceFormPage" hx-select-oob="#messages-container" hx-swap="outerHTML" data-ui="service-form-shell">
+<div class="form-shell">
+    <h1 class="form-title">
+        {% if service %}{% translate "Edit service" %}{% else %}{% translate "New service" %}{% endif %}
+    </h1>
+
+    <div class="card-core" data-ui="service-form-fields">
+        <div class="card-body">
+            <form method="post" hx-post="{{ request.get_full_path }}" hx-target="#serviceFormPage" hx-select="#serviceFormPage" hx-select-oob="#messages-container" hx-swap="outerHTML">
+                {% csrf_token %}
+                {% if form.non_field_errors %}<div class="alert-core alert-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }} *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="form-field-error">
+                        {{ form.name.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.price.id_for_label }}">{{ form.price.label }} *</label>
+                    {{ form.price }}
+                    {% if form.price.errors %}
+                    <div class="form-field-error">
+                        {{ form.price.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {{ form.category.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-check-label">
+                        {{ form.active }}
+                        <span>{{ form.active.label }}</span>
+                    </label>
+                    <small class="form-help-text">
+                        {% translate "Inactive services are not offered in the visit catalog." %}
+                    </small>
+                </div>
+
+                <div class="form-actions" data-ui="service-form-actions">
+                    <button type="submit" class="btn-core btn-primary">
+                        {% translate "Save service" %}
+                    </button>
+                    <a href="{% url 'service_list' %}" class="btn-core btn-secondary">
+                        {% translate "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

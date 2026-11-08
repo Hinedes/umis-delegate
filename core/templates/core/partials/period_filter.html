@@ -1,0 +1,7 @@
+{% load i18n %}
+<form method="get" class="page-header-actions filter-inline-form">
+    <input type="date" name="start" value="{{ start_date|date:'Y-m-d' }}" class="form-control-core form-control-inline" aria-label="{% translate 'From' %}">
+    <span class="text-subtle">-</span>
+    <input type="date" name="end" value="{{ end_date|date:'Y-m-d' }}" class="form-control-core form-control-inline" aria-label="{% translate 'To' %}">
+    <button type="submit" class="btn-core btn-primary">{% translate "Show" %}</button>
+</form>

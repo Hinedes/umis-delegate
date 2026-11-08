@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{{ visit.patient.full_name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-section-stack">
+    {% include 'core/partials/page_header.html' with title=visit.patient.full_name %}
+
+    <section class="card-core">
+        <div class="card-header card-header-between">
+            <span>{% translate "Visit overview" %}</span>
+            <span class="badge-core status-badge status-{{ visit.status|lower }}">
+                {{ visit.get_status_display }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="approval-stats">
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Time" %}</span>
+                    <span class="approval-stat-value">{{ visit.visit_datetime|en_date }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Doctor" %}</span>
+                    <span class="approval-stat-value">
+                        {% if visit.assigned_doctor %}
+                        {{ visit.assigned_doctor.get_full_name|default:visit.assigned_doctor }}
+                        {% else %}
+                        {% translate "Unassigned" %}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Floor" %}</span>
+                    <span class="approval-stat-value">{{ visit.get_floor_display }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Type" %}</span>
+                    <span class="approval-stat-value">{{ visit.get_visit_type_display }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Referral source" %}</span>
+                    <span class="approval-stat-value">{{ visit.get_referral_source_display|default:"—" }}</span>
+                </div>
+            </div>
+
+            {% if visit.comment %}
+            <p class="step-timeline-detail"><strong>{% translate "Comment" %}:</strong> {{ visit.comment }}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card-core">
+        <div class="card-header">{% translate "Services" %}</div>
+        <div class="card-body-flush patient-registry-table-scroll">
+            <table class="table-core">
+                <thead>
+                    <tr>
+                        <th>{% translate "Service" %}</th>
+                        <th>{% translate "Price" %}</th>
+                        <th>{% translate "Quantity" %}</th>
+                        <th>{% translate "Line total" %}</th>
+                        <th>{% translate "Status" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                    <tr>
+                        <td>{{ line.service.name }}</td>
+                        <td>{{ line.price_snapshot }}</td>
+                        <td>{{ line.quantity }}</td>
+                        <td>{{ line.line_total }}</td>
+                        <td>
+                            {% if line.is_cancelled %}
+                            <span class="badge-core status-cancelled">{% translate "Cancelled" %}</span>
+                            {% else %}
+                            <span class="badge-core status-completed">{% translate "Active" %}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="table-empty-cell">{% translate "No services." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card-core">
+        <div class="card-header">{% translate "Balance" %}</div>
+        <div class="card-body">
+            <div class="approval-stats">
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Billed total" %}</span>
+                    <span class="approval-stat-value">{{ visit.total_cost }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Settled paid" %}</span>
+                    <span class="approval-stat-value">{{ visit.amount_paid }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Refunded" %}</span>
+                    <span class="approval-stat-value">{{ visit.already_refunded }}</span>
+                </div>
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Amount due" %}</span>
+                    <span class="approval-stat-value">{{ visit.amount_due }}</span>
+                </div>
+                {% if visit.net_balance < 0 %}
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Credit balance" %}</span>
+                    <span class="approval-stat-value">{{ visit.net_balance }}</span>
+                </div>
+                {% endif %}
+                {% if visit.medicine_total %}
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Medicine total" %}</span>
+                    <span class="approval-stat-value">{{ visit.medicine_total }}</span>
+                </div>
+                {% endif %}
+                {% if visit.cancelled_services_total %}
+                <div class="approval-stat">
+                    <span class="approval-stat-label">{% translate "Cancelled total" %}</span>
+                    <span class="approval-stat-value">{{ visit.cancelled_services_total }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="card-core">
+        <div class="card-header">{% translate "Payments" %}</div>
+        <div class="card-body-flush patient-registry-table-scroll">
+            <table class="table-core">
+                <thead>
+                    <tr>
+                        <th>{% translate "Recorded at" %}</th>
+                        <th>{% translate "Type" %}</th>
+                        <th>{% translate "Amount" %}</th>
+                        <th>{% translate "Method" %}</th>
+                        <th>{% translate "Status" %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.payment_datetime|en_date }}</td>
+                        <td>{{ payment.get_type_display }}</td>
+                        <td>{{ payment.amount }}</td>
+                        <td>{{ payment.method.name }}</td>
+                        <td>{{ payment.get_status_display }}</td>
+                        <td>
+                            {% if payment.status == 'PENDING' and perms.core.verify_payment %}
+                            <a href="{% url 'payment_verify' payment.pk %}" class="table-link">
+                                {% translate "Verify" %}
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="table-empty-cell">{% translate "No payments." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        {% if perms.core.add_payment %}
+        <a href="{% url 'visit_record_payment' visit.pk %}" class="btn-core btn-primary">
+            {% translate "Record payment" %}
+        </a>
+        {% endif %}
+        {% if perms.core.change_payment and visit.can_process_refund %}
+        <form method="post" action="{% url 'visit_process_refund' visit.pk %}" class="action-form-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-core btn-secondary">
+                {% translate "Refund" %} {{ visit.actual_refundable }}
+            </button>
+        </form>
+        {% endif %}
+        {% if can_start %}
+        <form method="post" action="{% url 'visit_status_update' %}" class="action-form-inline">
+            {% csrf_token %}
+            <input type="hidden" name="visit_id" value="{{ visit.pk }}">
+            <button type="submit" name="action" value="start" class="btn-core btn-primary">
+                {% translate "Start visit" %}
+            </button>
+        </form>
+        {% endif %}
+        {% if can_change %}
+        <form method="post" action="{% url 'visit_status_update' %}" class="action-form-inline">
+            {% csrf_token %}
+            <input type="hidden" name="visit_id" value="{{ visit.pk }}">
+            <button type="submit" name="action" value="finish" class="btn-core btn-secondary">
+                {% translate "Complete visit" %}
+            </button>
+            <button type="submit" name="action" value="cancel" class="btn-core btn-danger">
+                {% translate "Cancel visit" %}
+            </button>
+        </form>
+        {% endif %}
+        {% if visit.status == 'REQUESTED' and perms.core.change_visit %}
+        <form method="post" action="{% url 'visit_accept_request' visit.pk %}" class="action-form-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-core btn-primary">{% translate "Accept request" %}</button>
+        </form>
+        {% endif %}
+        {% if perms.core.change_visit %}
+        <a href="{% url 'visit_edit' visit.pk %}" class="btn-core btn-secondary">
+            {% translate "Edit visit" %}
+        </a>
+        {% endif %}
+        {% if perms.core.delete_visit %}
+        <form method="post" action="{% url 'visit_delete' visit.pk %}" class="action-form-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-core btn-danger">{% translate "Delete visit" %}</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

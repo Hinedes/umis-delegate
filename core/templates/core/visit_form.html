@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load l10n %}
+{% load static i18n %}
+
+{% block title %}{% if is_edit %}{% translate "Edit visit" %}{% else %}{% translate "New visit" %}{% endif %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content_classes %}dashboard-canvas{% endblock %}
+
+{% block content %}
+<form method="post"
+      id="visitForm"
+      class="visit-form-root visit-form-layout-fixed"
+      data-visit-form="desktop"
+      data-new-patient-url="{% if perms.core.add_patient %}{% url 'patient_create' %}{% endif %}"
+      data-cancel-url="{% url 'visit_list' %}"
+      data-ui="visit-form-shell"
+      hx-post="{{ request.get_full_path }}"
+      hx-target="#visitForm"
+      hx-select="#visitForm"
+      hx-select-oob="#messages-container"
+      hx-swap="outerHTML"
+      x-data="{
+          isSubmitting: false,
+          syncVisitDateTime() {
+              const dateInput = this.$el.querySelector('#visitDateInput');
+              const timeInput = this.$el.querySelector('#visitTimeInput');
+              const datetimeInput = this.$el.querySelector('#id_visit_datetime');
+              if (!datetimeInput) {
+                  return;
+              }
+
+              const dateValue = dateInput ? dateInput.value : '';
+              const timeValue = timeInput ? timeInput.value : '';
+              datetimeInput.value = dateValue && timeValue ? `${dateValue}T${timeValue}` : '';
+          }
+      }"
+      @submit="syncVisitDateTime(); if ($el.checkValidity()) isSubmitting = true"
+      hx-on::after-request="isSubmitting = false">
+    {% csrf_token %}
+
+    <div class="visit-screen-shell visit-workspace">
+        <header class="visit-screen-header">
+            <div class="visit-screen-title-block">
+                <h1 class="visit-screen-title">
+                    {% if is_edit %}{% translate "Edit visit" %}{% else %}{% translate "New visit" %}{% endif %}
+                </h1>
+            </div>
+
+            <div class="visit-screen-header-actions">
+                <a href="{% url 'visit_list' %}" class="btn-core btn-secondary visit-screen-cancel-action">
+                    {% translate "Cancel" %}
+                </a>
+            </div>
+        </header>
+
+        <div class="visit-screen-grid">
+            <div class="visit-screen-main">
+                <section class="card-core visit-screen-card visit-screen-encounter-card"
+                         data-ui="visit-form-details">
+                    <div class="visit-screen-card-header">
+                        <div>
+                            <h2 class="visit-screen-catalog-title">{% translate "Visit details" %}</h2>
+                        </div>
+                    </div>
+
+                    <div class="visit-screen-card-body visit-screen-details-body visit-screen-encounter-body">
+                        <div class="visit-screen-details-content">
+                            {% if visit_form.errors or service_formset.total_error_count %}
+                            <div class="alert-core alert-error visit-screen-errors">
+                                <strong class="form-errors-title">{% translate "Please correct these errors:" %}</strong>
+                                <ul class="form-errors-list">
+                                    {% for field, errors in visit_form.errors.items %}
+                                        {% for error in errors %}
+                                            {% if field == '__all__' %}
+                                                <li>{{ error }}</li>
+                                            {% else %}
+                                                <li>{{ field|title }}: {{ error }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                    {% for error in service_formset.non_form_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+
+                                    {% for form in service_formset %}
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="visit-screen-details-row visit-screen-details-grid-figma">
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-patient">
+                                    <label class="form-label" for="id_patient">{% translate "Patient" %}</label>
+                                    {{ visit_form.patient }}
+                                    {% if visit_form.patient.errors %}
+                                    <div class="form-field-error">{{ visit_form.patient.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-date">
+                                    <label class="form-label" for="visitDateInput">{% translate "Date" %}</label>
+                                    <input type="date"
+                                           id="visitDateInput"
+                                           class="form-control-core"
+                                           value="{{ visit_form.visit_datetime.value|unlocalize|default_if_none:''|slice:':10' }}"
+                                           @input="syncVisitDateTime()"
+                                           required>
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-time">
+                                    <label class="form-label" for="visitTimeInput">{% translate "Time" %}</label>
+                                    <input type="time"
+                                           id="visitTimeInput"
+                                           class="form-control-core"
+                                           value="{{ visit_form.visit_datetime.value|unlocalize|default_if_none:''|slice:'11:16' }}"
+                                           @input="syncVisitDateTime()"
+                                           required>
+                                    <div class="visit-screen-datetime-hidden">
+                                        {{ visit_form.visit_datetime.as_hidden }}
+                                    </div>
+                                    {% if visit_form.visit_datetime.errors %}
+                                    <div class="form-field-error">{{ visit_form.visit_datetime.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-referral">
+                                    <label class="form-label" for="id_referral_source">{% translate "Referral source" %}</label>
+                                    {{ visit_form.referral_source }}
+                                    {% if visit_form.referral_source.errors %}
+                                    <div class="form-field-error">{{ visit_form.referral_source.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="visit-screen-details-row visit-screen-details-grid-figma">
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-doctor">
+                                    <label class="form-label" for="id_assigned_doctor">{% translate "Treating doctor" %}</label>
+                                    {{ visit_form.assigned_doctor }}
+                                    {% if visit_form.assigned_doctor.errors %}
+                                    <div class="form-field-error">{{ visit_form.assigned_doctor.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-type">
+                                    <label class="form-label" for="id_visit_type">{% translate "Visit type" %}</label>
+                                    {{ visit_form.visit_type }}
+                                    {% if visit_form.visit_type.errors %}
+                                    <div class="form-field-error">{{ visit_form.visit_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-floor">
+                                    <label class="form-label" for="id_floor">{% translate "Floor" %}</label>
+                                    {{ visit_form.floor }}
+                                    {% if visit_form.floor.errors %}
+                                    <div class="form-field-error">{{ visit_form.floor.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-0 visit-screen-field visit-screen-field-comment">
+                                    <label class="form-label" for="id_comment">{% translate "Notes" %}</label>
+                                    {{ visit_form.comment }}
+                                    {% if visit_form.comment.errors %}
+                                    <div class="form-field-error">{{ visit_form.comment.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card-core visit-screen-card visit-screen-catalog"
+                         data-ui="visit-form-catalog">
+                    <div class="visit-screen-card-header visit-screen-catalog-header">
+                        <div class="visit-screen-catalog-heading">
+                            <span class="material-symbols-outlined visit-screen-catalog-icon" aria-hidden="true">inventory_2</span>
+                            <h2 class="visit-screen-catalog-title">{% translate "Services and medicines" %}</h2>
+                        </div>
+
+                        <div class="visit-screen-search-wrap">
+                            <label for="serviceSearch" class="visually-hidden">{% translate "Search services and medicines" %}</label>
+                            <span class="material-symbols-outlined visit-screen-search-icon" aria-hidden="true">search</span>
+                            <input type="text"
+                                   id="serviceSearch"
+                                   class="form-control-core visit-screen-search-input"
+                                   placeholder="{% translate 'Search the catalog' %}"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="visit-screen-card-body visit-screen-catalog-body">
+                        <div id="noResults" class="service-no-results visit-screen-no-results" role="status">{% translate "No matching services or medicines." %}</div>
+
+                        <div class="visit-screen-catalog-scroll">
+                            <div class="service-tiles-grid visit-screen-catalog-grid">
+                                {% for service in services %}
+                                <button type="button" class="service-tile visit-screen-service-tile"
+                                     data-id="{{ service.id }}"
+                                     data-price="{{ service.price|unlocalize }}"
+                                     data-name="{{ service.name|lower }}"
+                                     data-name-display="{{ service.name|escape }}"
+                                     data-category="SERVICE">
+                                    <div class="visit-screen-service-line">
+                                        <span class="visit-screen-service-badge">{% translate "Service" %}</span>
+                                        <span class="service-tile-price">{{ service.price }}</span>
+                                    </div>
+                                    <div class="visit-screen-service-copy">
+                                        <div class="service-tile-name">{{ service.name }}</div>
+                                    </div>
+                                </button>
+                                {% endfor %}
+
+                                {% for medicine in medicines %}
+                                <button type="button" class="service-tile service-tile-medicine visit-screen-service-tile"
+                                     data-id="{{ medicine.id }}"
+                                     data-price="{{ medicine.price|unlocalize }}"
+                                     data-name="{{ medicine.name|lower }}"
+                                     data-name-display="{{ medicine.name|escape }}"
+                                     data-category="MEDICINE">
+                                    <div class="visit-screen-service-line">
+                                        <span class="visit-screen-service-badge visit-screen-service-badge-medicine">{% translate "Medicine" %}</span>
+                                        <span class="service-tile-price">{{ medicine.price }}</span>
+                                    </div>
+                                    <div class="visit-screen-service-copy">
+                                        <div class="service-tile-name">{{ medicine.name }}</div>
+                                    </div>
+                                </button>
+                                {% endfor %}
+
+                                {% if not services and not medicines %}
+                                <div class="service-empty">{% translate "No active services or medicines. Add items to the catalog first." %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="card-core visit-screen-card visit-screen-summary"
+                   data-ui="visit-form-billing">
+                <div class="visit-summary-panel-head">
+                    <span class="material-symbols-outlined visit-summary-panel-icon" aria-hidden="true">receipt_long</span>
+                    <h2 class="visit-summary-panel-title">{% translate "Visit summary" %}</h2>
+                </div>
+
+                <div class="visit-screen-card-body visit-summary-body">
+                    <div class="visit-summary-top">
+                        <div class="visit-summary-items-wrap">
+                            <div id="billingBody" class="visit-summary-items">
+                                <div id="servicesHeader" class="visit-summary-anchor services-header is-hidden" aria-hidden="true">
+                                    {% translate "Services" %}
+                                </div>
+                                <div id="medicinesHeader" class="visit-summary-anchor medicines-header is-hidden" aria-hidden="true">
+                                    {% translate "Medicines" %}
+                                </div>
+
+                                <div id="emptyRow" class="visit-summary-empty">
+                                    <p class="visit-summary-empty-title">{% translate "Nothing selected yet" %}</p>
+                                    <p class="visit-summary-empty-copy">{% translate "Choose services or medicines from the catalog to add them to this visit." %}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="subtotals" class="visit-summary-stats">
+                            <div class="visit-summary-stat-row">
+                                <span class="visit-summary-stat-label">{% translate "Catalog value" %}</span>
+                                <span id="summarySubtotalDisplay" class="visit-summary-stat-value">0.00</span>
+                            </div>
+                            <div id="servicesSubtotal" class="visit-summary-stat-row is-hidden">
+                                <span class="visit-summary-stat-label">{% translate "Services" %}</span>
+                                <span id="servicesTotal" class="visit-summary-stat-value">0.00</span>
+                            </div>
+                            <div id="medicinesSubtotal" class="visit-summary-stat-row visit-summary-stat-row-medicine is-hidden">
+                                <span class="visit-summary-stat-label">{% translate "Medicines" %}</span>
+                                <span id="medicinesTotal" class="visit-summary-stat-value">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visit-summary-balance-panel">
+                        <div class="visit-summary-balance-row">
+                            <span class="visit-summary-balance-label">{% translate "Billed service total" %}</span>
+                            <span id="totalDisplay" class="visit-summary-balance-value">0.00</span>
+                        </div>
+
+                        <div class="visit-summary-note">
+                            <span class="material-symbols-outlined visit-summary-note-icon" aria-hidden="true">info</span>
+                            <p class="visit-summary-note-copy">
+                                {% translate "Prices are confirmed when saved. Medicine value is tracked separately from the patient balance." %}
+                            </p>
+                        </div>
+
+                        <div class="visit-screen-submit-hints visually-hidden" aria-label="{% translate 'Keyboard shortcuts' %}">
+                            <span class="visit-screen-hint">
+                                <kbd>Ctrl</kbd><kbd>Enter</kbd>
+                            </span>
+                            <span class="visit-screen-hint">
+                                <kbd>/</kbd>
+                            </span>
+                            <span class="visit-screen-hint">
+                                <kbd>Esc</kbd>
+                            </span>
+                        </div>
+
+                        <button type="submit"
+                                class="btn-core btn-primary w-100 summary-submit-btn visit-summary-submit-btn"
+                                x-bind:disabled="isSubmitting">
+                            <span x-show="!isSubmitting" class="visit-summary-submit-label">
+                                <span>{% translate "Save visit" %}</span>
+                                <span class="material-symbols-outlined visit-summary-submit-arrow" aria-hidden="true">arrow_forward</span>
+                            </span>
+                            <span x-show="isSubmitting">{% translate "Saving…" %}</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="hidden-management">
+            {{ service_formset.management_form }}
+            <div id="formsetContainer">
+                {% for form in service_formset %}
+                <div data-idx="{{ forloop.counter0 }}"
+                     data-selected="{% if form.service.value and not form.DELETE.value %}1{% else %}0{% endif %}"
+                     data-service-id="{{ form.service.value|default_if_none:'' }}"
+                     data-name-display="{% if form.instance.service %}{{ form.instance.service.name|escape }}{% endif %}"
+                     data-price="{% if form.instance.pk %}{{ form.instance.price_snapshot|unlocalize }}{% endif %}"
+                     data-qty="{{ form.quantity.value|default:form.instance.quantity|default:'1' }}"
+                     data-category="{% if form.instance.service %}{{ form.instance.service.category }}{% endif %}">
+                    {{ form.id }}
+                    <input type="hidden" name="{{ form.prefix }}-service"
+                           value="{{ form.service.value|default_if_none:'' }}"
+                           id="id_{{ form.prefix }}-service">
+                    <input type="hidden" name="{{ form.prefix }}-quantity"
+                           value="{{ form.quantity.value|default_if_none:'1' }}"
+                           id="id_{{ form.prefix }}-quantity">
+                    {% if form.DELETE.value %}
+                    <input type="hidden" name="{{ form.prefix }}-DELETE" value="on">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</form>
+
+<link href="{% static 'vendor/tom-select/tom-select.default.min.css' %}" rel="stylesheet">
+<script src="{% static 'vendor/tom-select/tom-select.complete.min.js' %}"></script>
+<script src="{% static 'core/js/visit_form.js' %}"></script>
+{% endblock %}

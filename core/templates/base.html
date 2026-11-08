@@ -1,0 +1,188 @@
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}"
+      class="{% if theme.color_scheme_resolved == 'dark' %}dark{% else %}light{% endif %}"
+      data-theme="modern"
+      data-color-scheme="{{ theme.color_scheme }}"
+      data-color-scheme-resolved="{{ theme.color_scheme_resolved }}"
+      data-dark="{% if theme.color_scheme_resolved == 'dark' %}true{% else %}false{% endif %}">
+
+<head>
+    {# ── Inline color-scheme resolution to prevent flash of wrong theme ── #}
+    <script>
+        (function() {
+            try {
+                const cookies = document.cookie.split('; ').reduce((acc, part) => {
+                    const parts = part.split('=');
+                    acc[parts[0]] = decodeURIComponent(parts[1] || '');
+                    return acc;
+                }, {});
+                if (cookies.umis_color_scheme_resolved) return;
+                const scheme = cookies.umis_color_scheme;
+                let resolved = null;
+                if (scheme === 'dark' || scheme === 'light') {
+                    resolved = scheme;
+                } else {
+                    resolved = 'light';
+                }
+                if (!resolved) return;
+                const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
+                document.cookie = 'umis_color_scheme_resolved=' + encodeURIComponent(resolved)
+                    + '; expires=' + expires + '; path=/; SameSite=Lax';
+            } catch (e) {}
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/png" href="{% static 'core/icons/icon-192.png' %}">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+
+    {# ── Font preloads — fetch woff2 files before CSS requests them to eliminate FOUC ── #}
+    <link rel="preload" href="{% static 'vendor/fonts/inter/inter-cyrillic.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/fonts/inter/inter-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/fonts/manrope/manrope-cyrillic.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/fonts/manrope/manrope-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/fonts/material-symbols/material-symbols-outlined.woff2' %}?v=20260404-2" as="font" type="font/woff2" crossorigin>
+
+    {# ── Fonts: Manrope (display) + Inter (body) — locally served ── #}
+    <link href="{% static 'vendor/css/fonts.css' %}" rel="stylesheet">
+
+    {# ── Material Symbols Outlined — locally served ── #}
+    <link href="{% static 'vendor/css/material-symbols.css' %}?v=20260404-2" rel="stylesheet">
+
+    {# ── Tailwind CSS (compiled, purged build) ── #}
+    <link href="{% static 'vendor/css/tailwind.min.css' %}" rel="stylesheet">
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            line-height: 1;
+            display: inline-flex;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+    {# ── Bootstrap (Grid/Modal only — vendored) ── #}
+    <link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    {# ── Clinical Design System ── #}
+    <link href="{% static 'core/css/tokens.css' %}" rel="stylesheet">
+    <link href="{% static 'core/css/layout.css' %}?v=20260622-1" rel="stylesheet">
+    <link href="{% static 'core/css/components.css' %}?v=20260622-1" rel="stylesheet">
+    <link href="{% static 'core/css/theme-modern.css' %}?v=20260411-1" rel="stylesheet">
+    <link href="{% static 'core/css/theme-dark.css' %}?v=20260411-1" rel="stylesheet">
+
+    <!-- Alpine.js & HTMX — locally served -->
+    <script defer src="{% static 'vendor/js/alpinejs.min.js' %}"></script>
+    <script src="{% static 'vendor/js/htmx.min.js' %}"></script>
+
+    <script src="{% static 'vendor/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Global HTMX CSRF setup -->
+    <script>
+        document.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = (document.cookie.match(/csrftoken=([^;]+)/)||[])[1]||'';
+        });
+    </script>
+
+    <!-- HTMX redirect handler — prevents white screen when server returns 302 -->
+    <script>
+        document.addEventListener('htmx:beforeSwap', function(evt) {
+            var xhr = evt.detail.xhr;
+            var requestPath = evt.detail.requestConfig.path;
+            var responseURL = xhr.responseURL;
+            // If HTMX followed a redirect, navigate fully instead of swapping
+            if (responseURL && !responseURL.endsWith(requestPath) && responseURL.indexOf(requestPath) === -1) {
+                evt.preventDefault();
+                window.location.href = responseURL;
+            }
+        });
+    </script>
+</head>
+
+<body
+      data-session-age="{{ SESSION_COOKIE_AGE }}"
+      data-session-warn="{{ SESSION_WARN_SECONDS }}"
+      data-theme="modern"
+      data-color-scheme="{{ theme.color_scheme }}"
+      data-animations="{{ theme.animations }}">
+
+    <a class="skip-link" href="#main-content">{% translate "Skip to content" %}</a>
+
+    {# ── Fixed top header ── #}
+    {% include 'core/partials/header.html' %}
+
+    {# ── Fixed left sidebar ── #}
+    {% include 'core/partials/sidebar.html' %}
+
+    {# ── Scrollable main content area (offset by header + sidebar) ── #}
+    <main id="main-content" tabindex="-1" class="app-content {% block content_classes %}native-page{% endblock %}">
+        <p id="request-status" class="request-status" role="status" aria-live="polite" hidden></p>
+        {% include 'core/partials/messages.html' %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if user.is_authenticated %}{% include 'control/partials/assistant_widget.html' %}{% endif %}
+
+    {# ── Session timeout modal (Bootstrap) ── #}
+    {% include 'core/partials/modal.html' %}
+
+    <script>
+        if (!window._sessionTimerStarted) {
+            window._sessionTimerStarted = true;
+            const sessionAge = parseInt(document.body.dataset.sessionAge) || 1200;
+            const warnSeconds = parseInt(document.body.dataset.sessionWarn) || 120;
+            const warningTimeMs = (sessionAge - warnSeconds) * 1000;
+            let warningTimer;
+            let lastActivity = Date.now();
+
+            ['mousemove', 'keydown', 'click'].forEach(evt =>
+                document.addEventListener(evt, () => { lastActivity = Date.now(); }));
+
+            function resetSession() {
+                fetch('{% url "session_ping" %}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/)||[])[1]||'', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                }).then(r => {
+                    if (r.redirected) {
+                        window.location.assign(r.url);
+                    } else if (r.ok) {
+                        bootstrap.Modal.getInstance(document.getElementById('sessionModal'))?.hide();
+                        startTimer();
+                    } else {
+                        document.getElementById('session-error').hidden = false;
+                    }
+                }).catch(() => {
+                    document.getElementById('session-error').hidden = false;
+                });
+            }
+
+            function startTimer() {
+                clearTimeout(warningTimer);
+                warningTimer = setTimeout(() => {
+                    const timeSinceAct = Date.now() - lastActivity;
+                    if (timeSinceAct < 60000) { resetSession(); }
+                    else {
+                        const modalEl = document.getElementById('sessionModal');
+                        if (modalEl) {
+                            document.getElementById('staySignedInBtn')
+                                ?.addEventListener('click', resetSession, { once: true });
+                            new bootstrap.Modal(modalEl).show();
+                        }
+                    }
+                }, warningTimeMs);
+            }
+
+            startTimer();
+        }
+    </script>
+
+    <script src="{% static 'core/js/theme-switcher.js' %}"></script>
+    <script src="{% static 'core/js/app.js' %}" defer></script>
+
+</body>
+</html>

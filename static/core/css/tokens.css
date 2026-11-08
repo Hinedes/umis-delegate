@@ -1,0 +1,302 @@
+:root {
+    /* --- Clinical Palette --- */
+    /* Neutrals */
+    --color-bg-body: #f7f9fb;
+    /* Surface */
+    --color-bg-body-rgb: 247 249 251;
+    --color-bg-surface: #ffffff;
+    /* White */
+    --color-bg-surface-rgb: 255 255 255;
+    --color-bg-sidebar: #111827;
+    /* Gray 900 */
+    --color-bg-sidebar-rgb: 17 24 39;
+    --color-border: #e5e7eb;
+    /* Soft Gray */
+    --color-border-rgb: 229 231 235;
+    --color-text-main: #191c1e;
+    /* On-surface */
+    --color-text-main-rgb: 25 28 30;
+    --color-text-muted: #5f6368;
+    /* Muted Gray */
+    --color-text-muted-rgb: 95 99 104;
+    --color-text-inverse: #f9fafb;
+    /* Gray 50 */
+    --color-text-inverse-rgb: 249 250 251;
+    /* Gray 50 */
+    --color-bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+    --color-bg-sidebar-active: var(--color-primary);
+    --color-bg-subtle: #f2f4f6;
+    --color-surface-alt: #f2f4f6;
+    --color-border-subtle: #e5e7eb;
+    --color-border-subtle-rgb: 229 231 235;
+    --color-overlay-subtle: rgba(0, 0, 0, 0.03);
+
+    /* Alias tokens kept for templates */
+    --color-bg-app: #f7f9fb;
+    --color-bg-app-rgb: 247 249 251;
+    --color-bg-surface-elevated: #ffffff;
+    --color-bg-surface-elevated-rgb: 255 255 255;
+    --color-divider: #e5e7eb;
+    --color-divider-rgb: 229 231 235;
+    --border-color: #e5e7eb;
+    --border-color-rgb: 229 231 235;
+    --color-gradient-brand: linear-gradient(135deg, #003f87 0%, #0056b3 100%);
+    --shadow-soft: 0px 12px 32px rgba(25, 28, 30, 0.06);
+    --shadow-nav: 0px -12px 32px rgba(25, 28, 30, 0.06);
+
+    /* Brand / Actions */
+    --color-primary: #003f87;
+    /* Clinical Blue */
+    --color-primary-rgb: 0 63 135;
+    --color-primary-container: #0056b3;
+    --color-primary-container-rgb: 0 86 179;
+    --color-on-primary-container: #d7e8ff;
+    --color-on-primary-container-rgb: 215 232 255;
+    --color-primary-hover: #004a99;
+    /* Clinical Blue Hover */
+    --color-primary-hover-rgb: 0 74 153;
+    --color-danger: #b91c1c;
+    /* Red 700 */
+    --color-danger-rgb: 185 28 28;
+    --color-warning: #b45309;
+    /* Amber 700 */
+    --color-warning-rgb: 180 83 9;
+    --color-warning-hover: #92400e;
+    --color-warning-hover-rgb: 146 64 14;
+    --color-success: #006e25;
+    /* Health Green */
+    --color-success-rgb: 0 110 37;
+    --color-danger-hover: #991b1b;
+    --color-danger-hover-rgb: 153 27 27;
+
+    --color-success-bg: #d8f3dd;
+    --color-success-bg-rgb: 216 243 221;
+    --color-success-text: #1b5e20;
+    --color-success-text-rgb: 27 94 32;
+    --color-warning-bg: #fef3c7;
+    --color-warning-bg-rgb: 254 243 199;
+    --color-warning-text: #92400e;
+    --color-warning-text-rgb: 146 64 14;
+    --color-danger-bg: #fee2e2;
+    --color-danger-bg-rgb: 254 226 226;
+    --color-danger-text: #991b1b;
+    --color-danger-text-rgb: 153 27 27;
+
+    /* Feedback / Alerts */
+    --color-alert-success-bg: #d1fae5;
+    --color-alert-success-bg-rgb: 209 250 229;
+    --color-alert-success-text: #065f46;
+    --color-alert-success-text-rgb: 6 95 70;
+    --color-alert-success-border: #a7f3d0;
+    --color-alert-success-border-rgb: 167 243 208;
+    --color-alert-error-bg: #fee2e2;
+    --color-alert-error-bg-rgb: 254 226 226;
+    --color-alert-error-text: #b91c1c;
+    --color-alert-error-text-rgb: 185 28 28;
+    --color-alert-error-border: #fecaca;
+    --color-alert-error-border-rgb: 254 202 202;
+    --color-alert-warning-bg: #fef3c7;
+    --color-alert-warning-bg-rgb: 254 243 199;
+    --color-alert-warning-text: #92400e;
+    --color-alert-warning-text-rgb: 146 64 14;
+    --color-alert-warning-border: #fde68a;
+    --color-alert-warning-border-rgb: 253 230 138;
+    --color-alert-info-bg: #e0f2fe;
+    --color-alert-info-bg-rgb: 224 242 254;
+    --color-alert-info-text: #075985;
+    --color-alert-info-text-rgb: 7 89 133;
+    --color-alert-info-border: #bae6fd;
+    --color-alert-info-border-rgb: 186 230 253;
+
+    /* Status */
+    --color-status-completed-bg: #d4edda;
+    --color-status-completed-bg-rgb: 212 237 218;
+    --color-status-completed-text: #155724;
+    --color-status-completed-text-rgb: 21 87 36;
+    --color-status-pending-bg: #fff3cd;
+    --color-status-pending-bg-rgb: 255 243 205;
+    --color-status-pending-text: #856404;
+    --color-status-pending-text-rgb: 133 100 4;
+    --color-status-cancelled-bg: #f8d7da;
+    --color-status-cancelled-bg-rgb: 248 215 218;
+    --color-status-cancelled-text: #721c24;
+    --color-status-cancelled-text-rgb: 114 28 36;
+
+    /* Badges */
+    --color-badge-payment-bg: #d1fae5;
+    --color-badge-payment-bg-rgb: 209 250 229;
+    --color-badge-payment-text: #065f46;
+    --color-badge-payment-text-rgb: 6 95 70;
+    --color-badge-refund-bg: #fff7ed;
+    --color-badge-refund-bg-rgb: 255 247 237;
+    --color-badge-refund-text: #9a3412;
+    --color-badge-refund-text-rgb: 154 52 18;
+    --color-badge-cash-bg: #d4edda;
+    --color-badge-cash-bg-rgb: 212 237 218;
+    --color-badge-cash-text: #155724;
+    --color-badge-cash-text-rgb: 21 87 36;
+    --color-badge-mbank-bg: #d1fae5;
+    --color-badge-mbank-bg-rgb: 209 250 229;
+    --color-badge-mbank-text: #065f46;
+    --color-badge-mbank-text-rgb: 6 95 70;
+    --color-badge-bakai-bg: #dbeafe;
+    --color-badge-bakai-bg-rgb: 219 234 254;
+    --color-badge-bakai-text: #1e40af;
+    --color-badge-bakai-text-rgb: 30 64 175;
+    --color-badge-mbusiness-bg: #fef9c3;
+    --color-badge-mbusiness-bg-rgb: 254 249 195;
+    --color-badge-mbusiness-text: #854d0e;
+    --color-badge-mbusiness-text-rgb: 133 77 14;
+    --color-badge-visa-bg: #e0e7ff;
+    --color-badge-visa-bg-rgb: 224 231 255;
+    --color-badge-visa-text: #3730a3;
+    --color-badge-visa-text-rgb: 55 48 163;
+    --color-badge-operation-bg: #fee2e2;
+    --color-badge-operation-bg-rgb: 254 226 226;
+    --color-badge-operation-text: #991b1b;
+    --color-badge-operation-text-rgb: 153 27 27;
+    --color-badge-repeat-bg: #fef3c7;
+    --color-badge-repeat-bg-rgb: 254 243 199;
+    --color-badge-repeat-text: #b45309;
+    --color-badge-repeat-text-rgb: 180 83 9;
+    --color-badge-note-bg: #e0f2fe;
+    --color-badge-note-bg-rgb: 224 242 254;
+    --color-badge-note-text: #075985;
+    --color-badge-note-text-rgb: 7 89 133;
+    --color-badge-neutral-bg: #e2e8f0;
+    --color-badge-neutral-bg-rgb: 226 232 240;
+    --color-badge-neutral-text: #1e293b;
+    --color-badge-neutral-text-rgb: 30 41 59;
+
+    /* Card header variants */
+    --color-card-header-danger-bg: #fef2f2;
+    --color-card-header-danger-bg-rgb: 254 242 242;
+    --color-card-header-danger-text: #991b1b;
+    --color-card-header-danger-text-rgb: 153 27 27;
+    --color-card-header-danger-border: #fecaca;
+    --color-card-header-danger-border-rgb: 254 202 202;
+    --color-card-header-warning-bg: #fffbeb;
+    --color-card-header-warning-bg-rgb: 255 251 235;
+    --color-card-header-warning-text: #92400e;
+    --color-card-header-warning-text-rgb: 146 64 14;
+    --color-card-header-warning-border: #fcd34d;
+    --color-card-header-warning-border-rgb: 252 211 77;
+    --color-card-header-info-bg: #eff6ff;
+    --color-card-header-info-bg-rgb: 239 246 255;
+    --color-card-header-info-text: #1e40af;
+    --color-card-header-info-text-rgb: 30 64 175;
+    --color-card-header-info-border: #bfdbfe;
+    --color-card-header-info-border-rgb: 191 219 254;
+
+    /* Visit section headers */
+    --color-services-header-bg: #e0f2fe;
+    --color-services-header-bg-rgb: 224 242 254;
+    --color-services-header-text: #075985;
+    --color-services-header-text-rgb: 7 89 133;
+    --color-medicines-header-bg: #fff3e0;
+    --color-medicines-header-bg-rgb: 255 243 224;
+    --color-medicines-header-text: #b45309;
+    --color-medicines-header-text-rgb: 180 83 9;
+
+    /* Payment cards */
+    --color-payment-mbank-bg: #d1fae5;
+    --color-payment-mbank-bg-rgb: 209 250 229;
+    --color-payment-mbank-border: #10b981;
+    --color-payment-mbank-border-rgb: 16 185 129;
+    --color-payment-mbank-text: #065f46;
+    --color-payment-mbank-text-rgb: 6 95 70;
+    --color-payment-bakai-bg: #dbeafe;
+    --color-payment-bakai-bg-rgb: 219 234 254;
+    --color-payment-bakai-border: #3b82f6;
+    --color-payment-bakai-border-rgb: 59 130 246;
+    --color-payment-bakai-text: #1e40af;
+    --color-payment-bakai-text-rgb: 30 64 175;
+    --color-payment-cash-bg: var(--color-bg-surface);
+    --color-payment-cash-bg-rgb: 255 255 255;
+    --color-payment-cash-border: #e5e7eb;
+    --color-payment-cash-border-rgb: 229 231 235;
+    --color-payment-cash-value: #374151;
+    --color-payment-cash-value-rgb: 55 65 81;
+    --color-payment-cash-label: #6b7280;
+    --color-payment-cash-label-rgb: 107 114 128;
+    --color-payment-mbusiness-bg: #fef9c3;
+    --color-payment-mbusiness-bg-rgb: 254 249 195;
+    --color-payment-mbusiness-border: #eab308;
+    --color-payment-mbusiness-border-rgb: 234 179 8;
+    --color-payment-mbusiness-text: #854d0e;
+    --color-payment-mbusiness-text-rgb: 133 77 14;
+    --color-payment-expense-bg: #fee2e2;
+    --color-payment-expense-bg-rgb: 254 226 226;
+    --color-payment-expense-border: #ef4444;
+    --color-payment-expense-border-rgb: 239 68 68;
+    --color-payment-expense-text: #991b1b;
+    --color-payment-expense-text-rgb: 153 27 27;
+
+    /* Surface Hierarchy (Material Design 3 inspired) */
+    --surface: #f7f9fb;
+    --surface-rgb: 247 249 251;
+    --surface-container-low: #f2f4f6;
+    --surface-container-low-rgb: 242 244 246;
+    --surface-container-lowest: #ffffff;
+    --surface-container-lowest-rgb: 255 255 255;
+    --surface-container: #eceef0;
+    --surface-container-rgb: 236 238 240;
+    --surface-container-high: #eaecef;
+    --surface-container-high-rgb: 234 236 239;
+    --surface-container-highest: #e0e3e5;
+    --surface-container-highest-rgb: 224 227 229;
+    --surface-dim: #d8dadc;
+    --surface-dim-rgb: 216 218 220;
+    --on-surface: #191c1e;
+    --on-surface-rgb: 25 28 30;
+    --primary-fixed: #d7e2ff;
+    --primary-fixed-rgb: 215 226 255;
+    --primary-fixed-dim: #84a7ff;
+    --primary-fixed-dim-rgb: 132 167 255;
+    --inverse-primary: #84a7ff;
+    --inverse-primary-rgb: 132 167 255;
+
+    --color-secondary: #006e25;
+    --color-secondary-rgb: 0 110 37;
+    --color-secondary-container: #d8f3dd;
+    --color-secondary-container-rgb: 216 243 221;
+    --color-on-secondary-container: #1b5e20;
+    --color-on-secondary-container-rgb: 27 94 32;
+    --color-tertiary: #2d4455;
+    --color-tertiary-rgb: 45 68 85;
+
+    /* Shadows & Focus */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-ambient: 0px 12px 32px rgba(25, 28, 30, 0.06);
+    --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px var(--color-primary);
+
+    /* Spacing & Sizing */
+    --space-1: 0.25rem;
+    /* 4px */
+    --space-2: 0.5rem;
+    /* 8px */
+    --space-3: 0.75rem;
+    /* 12px */
+    --space-4: 1rem;
+    /* 16px */
+    --space-6: 1.5rem;
+    /* 24px */
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    --header-height: 3.5rem;
+    /* 56px */
+    --sidebar-width: 16rem;
+    /* 256px */
+
+    /* Typography */
+    --font-system: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Manrope", var(--font-system);
+    --font-body: "Inter", var(--font-system);
+    --font-label: "Inter", var(--font-system);
+    --font-sans: var(--font-body);
+}

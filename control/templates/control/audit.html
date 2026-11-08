@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Agent audit activity" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-section-stack">
+    {% translate "Agent audit activity" as page_title %}
+    {% url 'control_panel' as action_url %}
+    {% translate "Back to assistant" as action_label %}
+    {% include 'core/partials/page_header.html' with title=page_title action_url=action_url action_label=action_label action_icon="arrow_back" %}
+
+    <section class="card-core">
+        <div class="card-header">{% translate "Audit events" %}</div>
+        {% if events %}
+        <div class="card-body-flush patient-registry-table-scroll">
+            <table class="table-core">
+                <thead>
+                    <tr>
+                        <th>{% translate "When" %}</th>
+                        <th>{% translate "Actor" %}</th>
+                        <th>{% translate "Action" %}</th>
+                        <th>{% translate "Description" %}</th>
+                        <th>{% translate "Metadata" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.created_at|en_date }}</td>
+                        <td>{{ event.actor_label }}</td>
+                        <td>{{ event.get_action_display }}</td>
+                        <td>{{ event.description }}</td>
+                        <td><code>{{ event.metadata }}</code></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card-body">
+            <p class="empty-state-text">{% translate "No agent audit events yet." %}</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

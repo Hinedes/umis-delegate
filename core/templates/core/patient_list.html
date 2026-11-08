@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Patient registry" %} · {{ SITE_NAME }}{% endblock %}
+{% block content_classes %}registry-workspace-main{% endblock %}
+
+{% block content %}
+{% include 'core/partials/registry_workspace.html' %}
+{% endblock %}

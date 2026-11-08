@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Shift report" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="shift-report-shell">
+    <div class="form-back-row">
+        <a href="{% url 'shift_list' %}" class="form-back-link">← {% translate "Back to shifts" %}</a>
+    </div>
+    <h1 class="form-title">{% translate "Shift report" %}: {{ shift.get_floor_display }}</h1>
+    <div class="card-core" data-ui="shift-report-summary">
+        <div class="card-header card-header-between">
+            <span>{% translate "Shift" %} #{{ shift.pk }}</span>
+            <span class="badge-core {% if shift.status == 'OPEN' %}status-pending{% else %}status-completed{% endif %}">{{ shift.get_status_display }}</span>
+        </div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <span class="detail-label">{% translate "Opened" %}</span>
+                <span class="detail-value">{{ shift.opened_at|en_date }} ({{ shift.opened_by }})</span>
+                <span class="detail-label">{% translate "Closed" %}</span>
+                <span class="detail-value">{% if shift.closed_at %}{{ shift.closed_at|en_date }}{% else %}-{% endif %}{% if shift.closed_by %} ({{ shift.closed_by }}){% endif %}</span>
+                <span class="detail-label">{% translate "Patients" %}</span>
+                <span class="detail-value">{{ totals.patient_count }}</span>
+                <span class="detail-label">{% translate "Visits" %}</span>
+                <span class="detail-value">{{ totals.visit_count }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-core surface-top" data-ui="shift-report-cash">
+        <div class="card-header">{% translate "Money" %}</div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <span class="detail-label">{% translate "Cash in" %}</span>
+                <span class="detail-value detail-value-success">{{ totals.cash_in }}</span>
+                <span class="detail-label">{% translate "Cash refunds" %}</span>
+                <span class="detail-value">{{ totals.cash_refund }}</span>
+                <span class="detail-label">{% translate "Cash expenses" %}</span>
+                <span class="detail-value">{{ totals.cash_expenses }}</span>
+                <span class="detail-label">{% translate "All payments" %}</span>
+                <span class="detail-value">{{ totals.total_payments }}</span>
+                <span class="detail-label">{% translate "All refunds" %}</span>
+                <span class="detail-value">{{ totals.total_refunds }}</span>
+                <span class="detail-label">{% translate "Manual expenses" %}</span>
+                <span class="detail-value">{{ totals.manual_expenses }}</span>
+                <span class="detail-label">{% translate "Opening cash" %}</span>
+                <span class="detail-value">{{ shift.opening_cash }}</span>
+                <span class="detail-label">{% translate "Expected cash" %}</span>
+                <span class="detail-value">{{ shift.expected_cash|default:"-" }}</span>
+                <span class="detail-label">{% translate "Closing cash" %}</span>
+                <span class="detail-value">{{ shift.closing_cash|default:"-" }}</span>
+                <span class="detail-label">{% translate "Difference" %}</span>
+                <span class="detail-value{% if shift.cash_difference and shift.cash_difference < 0 %} detail-value-danger{% endif %}">{{ shift.cash_difference|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

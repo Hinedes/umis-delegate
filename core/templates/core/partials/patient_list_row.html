@@ -1,0 +1,41 @@
+{% load i18n umis_ui %}
+<tr class="patient-registry-row">
+    <td class="patient-registry-cell patient-registry-cell-name">
+        <a href="{% url 'patient_detail' patient.id %}"
+           class="patient-registry-name-link"
+           hx-boost="false">
+            {{ patient.full_name }}
+        </a>
+        <span class="patient-registry-subtle">#{{ patient.id }}</span>
+    </td>
+    <td class="patient-registry-cell">
+        {% if patient.national_id %}
+        {% if patient.national_id %}
+        <span class="patient-registry-cell-primary">{{ patient.national_id }}</span>
+        {% endif %}
+        {% else %}
+        <span class="patient-registry-cell-dash">-</span>
+        {% endif %}
+    </td>
+    <td class="patient-registry-cell">
+        <span class="patient-registry-cell-primary">{{ patient.phone|default:"-" }}</span>
+    </td>
+    <td class="patient-registry-cell">
+        <span class="patient-registry-cell-primary">{{ patient.birth_date|en_date:"j M Y"|default:"-" }}</span>
+    </td>
+    <td class="patient-registry-cell">
+        <span class="patient-registry-cell-primary">{{ patient.get_floor_display }}</span>
+    </td>
+    <td class="patient-registry-cell patient-registry-cell-actions text-end">
+        <div class="patient-registry-row-actions" data-ui="patient-row-actions">
+            {% if perms.core.add_visit %}
+            <a href="{% url 'visit_create' %}?patient={{ patient.id }}"
+               class="btn-core patient-registry-visit-btn visit-registry-open-btn"
+               hx-boost="false">
+                 {% translate "New visit" %}
+            </a>
+            {% endif %}
+        </div>
+    </td>
+</tr>
+

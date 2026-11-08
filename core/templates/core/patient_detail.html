@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{{ patient.full_name }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="patient-detail-shell" data-ui="patient-detail-shell">
+    <section class="page-header-bar" data-ui="patient-summary">
+        <div class="page-heading-block">
+            <p class="section-label section-label-primary">{% translate "Patient record" %}</p>
+            <h1 class="page-heading">{{ patient.full_name }}</h1>
+            <p class="page-heading-meta">{{ patient.phone }} • {{ patient.get_floor_display }}</p>
+        </div>
+        <div class="page-header-actions">
+            <a href="{% url 'patient_list' %}" class="btn-core btn-secondary">{% translate "Back to registry" %}</a>
+            {% if perms.core.add_visit %}
+            <a href="{% url 'visit_create' %}?patient={{ patient.pk }}" class="btn-core btn-primary">+ {% translate "New visit" %}</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="patient-detail-grid">
+        <div class="patient-detail-aside">
+            <section class="card-core">
+                <div class="card-header">{% translate "Patient information" %}</div>
+                <div class="card-body card-body-flush">
+                    <div class="info-list-row"><span class="detail-label">{% translate "Phone" %}</span><span>{{ patient.phone }}</span></div>
+                    <div class="info-list-row"><span class="detail-label">{% translate "National ID or passport" %}</span><span>{{ patient.national_id|default:"-" }}</span></div>
+                    <div class="info-list-row"><span class="detail-label">{% translate "Date of birth" %}</span><span>{% if patient.birth_date %}{{ patient.birth_date|en_date:"j M Y" }}{% else %}-{% endif %}</span></div>
+                    <div class="info-list-row"><span class="detail-label">{% translate "Floor" %}</span><span>{{ patient.get_floor_display }}</span></div>
+                    <div class="info-list-row"><span class="detail-label">{% translate "Notes" %}</span><span class="patient-note-prewrap">{{ patient.notes|default:"-" }}</span></div>
+                </div>
+            </section>
+
+            {% if perms.core.change_patient or perms.core.delete_patient %}
+            <section class="card-core">
+                <div class="card-body stack-actions">
+                    {% if perms.core.change_patient %}
+                    <a href="{% url 'patient_edit' patient.pk %}" class="btn-core btn-secondary w-100">{% translate "Edit patient" %}</a>
+                    {% endif %}
+                    {% if perms.core.delete_patient %}
+                    <form method="post" action="{% url 'patient_delete' patient.pk %}" class="action-form-reset" onsubmit="return confirm('Delete this patient? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-core btn-danger w-100">{% translate "Delete patient" %}</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+        <section class="card-core" data-ui="patient-records">
+            <div class="card-header card-header-between">
+                <span>{% translate "Medical records" %}</span>
+                {% if perms.core.add_medicalrecord %}
+                <a href="{% url 'medical_record_create' patient.pk %}" class="btn-core btn-primary btn-compact">+ {% translate "Add record" %}</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="patient-record-list">
+                    {% for record in records %}
+                    <article class="patient-record-card">
+                        <div class="patient-record-card-head">
+                            <div class="patient-record-meta">
+                                <span class="badge-core {% if record.record_type == 'NOTE' %}badge-note{% else %}badge-repeat{% endif %}">{{ record.get_record_type_display }}</span>
+                                <span class="table-meta-text-sm">{{ record.record_datetime|en_date:"j M Y" }} | {{ record.doctor }}</span>
+                            </div>
+                            <div class="patient-record-actions">
+                                {% if perms.core.change_medicalrecord %}
+                                <a href="{% url 'medical_record_edit' record.pk %}" class="btn-core btn-secondary btn-compact">{% translate "Edit" %}</a>
+                                {% endif %}
+                                {% if perms.core.delete_medicalrecord %}
+                                <form method="post" action="{% url 'medical_record_delete' record.pk %}" class="action-form-reset" onsubmit="return confirm('Delete this record?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-core btn-danger btn-compact">{% translate "Delete" %}</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="patient-record-content">{{ record.content }}</p>
+                    </article>
+                    {% empty %}
+                    <div class="empty-state patient-empty-state"><div class="empty-state-title">{% translate "No records." %}</div></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

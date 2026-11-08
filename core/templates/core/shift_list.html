@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Shifts" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div data-ui="shift-list-shell">
+    <div class="page-header-bar" data-ui="shift-list-toolbar">
+        <h1 class="page-heading">{% translate "Shift management" %}</h1>
+        <a href="{% url 'shift_open' %}" class="btn-core btn-core-lg btn-primary">+ {% translate "Open shift" %}</a>
+    </div>
+
+    <div class="form-grid-2col form-group" data-ui="shift-list-summary">
+        {% for code, shift in active_shifts.items %}
+        <div class="card-core card-accent-primary">
+            <div class="card-header card-header-between">
+                <h5 class="mb-0">{% for value, label in floor_choices %}{% if value == code %}{{ label }}{% endif %}{% endfor %}</h5>
+                {% if shift %}
+                <span class="badge-core status-pending">{% translate "Shift open" %}</span>
+                {% else %}
+                <span class="badge-core status-completed">{% translate "No open shift" %}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if shift %}
+                <p class="mb-1"><strong>{% translate "Opened:" %}</strong> {{ shift.opened_at|en_date }}</p>
+                <p class="mb-1"><strong>{% translate "Opening cash:" %}</strong> {{ shift.opening_cash }}</p>
+                <p class="mb-3"><strong>{% translate "Opened by:" %}</strong> {{ shift.opened_by }}</p>
+                <a href="{% url 'shift_close' shift.pk %}" class="btn-core btn-warning w-100 text-center">{% translate "Close shift" %}</a>
+                {% else %}
+                <p class="text-subtle mb-0">{% translate "No shift is open on this floor." %}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card-core" data-ui="shift-list-results">
+        <div class="card-header"><h5 class="mb-0">{% translate "Shift history" %}</h5></div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table-core">
+                    <thead>
+                        <tr>
+                            <th>{% translate "Floor" %}</th>
+                            <th>{% translate "Opened" %}</th>
+                            <th>{% translate "Closed" %}</th>
+                            <th>{% translate "Status" %}</th>
+                            <th class="text-end">{% translate "Opening cash" %}</th>
+                            <th class="text-end">{% translate "Closing cash" %}</th>
+                            <th class="text-end">{% translate "Difference" %}</th>
+                            <th>{% translate "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for shift in shifts %}
+                        <tr>
+                            <td>{{ shift.get_floor_display }}</td>
+                            <td>{{ shift.opened_at|en_date }}</td>
+                            <td>{% if shift.closed_at %}{{ shift.closed_at|en_date }}{% else %}-{% endif %}</td>
+                            <td>
+                                {% if shift.status == 'OPEN' %}
+                                <span class="badge-core status-pending">{{ shift.get_status_display }}</span>
+                                {% else %}
+                                <span class="badge-core status-completed">{{ shift.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">{{ shift.opening_cash }}</td>
+                            <td class="text-end">{{ shift.closing_cash|default:"-" }}</td>
+                            <td class="text-end">
+                                {% if shift.cash_difference != None %}
+                                <span class="{% if shift.cash_difference >= 0 %}amount-cleared{% else %}amount-negative{% endif %}">{{ shift.cash_difference }}</span>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    {% if shift.status == 'OPEN' %}
+                                    <a href="{% url 'shift_close' shift.pk %}" class="btn-core btn-warning btn-sm">{% translate "Close" %}</a>
+                                    {% endif %}
+                                    <a href="{% url 'shift_report' shift.pk %}" class="btn-core btn-secondary btn-sm">{% translate "Report" %}</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="8" class="table-empty-cell" data-ui="shift-list-empty">{% translate "No shifts yet." %}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

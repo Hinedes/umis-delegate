@@ -1,0 +1,16 @@
+{% load i18n %}
+<div class="card-core card-fill-height">
+    <div class="card-header"><h2 class="panel-title">{{ title }}</h2></div>
+    <div class="card-body">
+        <table class="table-core">
+            <thead><tr><th>{{ column }}</th><th class="text-end">{% translate "Visits" %}</th><th class="text-end">{% translate "Billed service value" %}</th></tr></thead>
+            <tbody>
+                {% for row in rows %}
+                <tr><td>{{ row.label }}</td><td class="text-end table-cell-strong">{{ row.visits }}</td><td class="text-end table-cell-strong">{{ row.billed_service_total }}</td></tr>
+                {% empty %}
+                <tr><td colspan="3" class="table-empty-cell">{% translate "No visits in this period." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

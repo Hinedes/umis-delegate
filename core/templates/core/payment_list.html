@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Payments" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="workspace-shell payment-ledger-shell" data-ui="payment-ledger-shell">
+    <section class="workspace-toolbar payment-ledger-toolbar">
+        <div class="workspace-hero patient-registry-hero">
+            <div class="workspace-heading-block patient-registry-heading-block">
+                <p class="workspace-overline patient-registry-overline">
+                    <span class="material-symbols-outlined patient-registry-overline-icon" aria-hidden="true">payments</span>
+                    <span>{% translate "Finance" %}</span>
+                </p>
+                <h1 class="workspace-title patient-registry-title">{% translate "Payments" %}</h1>
+                <p class="workspace-description patient-registry-description">{% translate "Recorded payments, refunds, and their verification status in one ledger." %}</p>
+            </div>
+            {% if perms.core.verify_payment %}
+            <a href="{% url 'payment_pending_list' %}" class="workspace-primary-action btn-core btn-core-lg btn-primary patient-registry-add-btn">
+                <span class="material-symbols-outlined" aria-hidden="true">fact_check</span>
+                <span>{% translate "Verification queue" %}</span>
+            </a>
+            {% endif %}
+        </div>
+
+        <form method="get" class="workspace-tray patient-registry-filter-tray" data-ui="payment-ledger-filters">
+            <div class="workspace-tray-copy patient-registry-filter-copy">
+                <span class="material-symbols-outlined patient-registry-filter-icon" aria-hidden="true">filter_alt</span>
+                <span class="workspace-tray-label patient-registry-filter-label">{% translate "Status:" %}</span>
+            </div>
+            <div class="workspace-tab-group patient-registry-filter-group" role="group" aria-label="{% translate 'Filter by status' %}">
+                <button type="submit" name="status" value="" class="workspace-tab-link patient-registry-filter-button{% if not current_status %} is-active{% endif %}">{% translate "All statuses" %}</button>
+                {% for code, label in status_choices %}
+                <button type="submit" name="status" value="{{ code }}" class="workspace-tab-link patient-registry-filter-button{% if code == current_status %} is-active{% endif %}">{{ label }}</button>
+                {% endfor %}
+            </div>
+        </form>
+    </section>
+
+    <div class="card-core" data-ui="payment-ledger-results">
+        <div class="card-header card-header-between">
+            <span>{% translate "All payments" %}</span>
+            <span class="card-header-meta">{{ page_obj.paginator.count }} {% translate "records" %}</span>
+        </div>
+        <div class="card-body card-body-flush table-scroll">
+            <table class="table-core">
+                <thead>
+                    <tr>
+                        <th>{% translate "Recorded at" %}</th>
+                        <th>{% translate "Patient" %}</th>
+                        <th>{% translate "Type" %}</th>
+                        <th class="text-end">{% translate "Amount" %}</th>
+                        <th>{% translate "Method" %}</th>
+                        <th>{% translate "Status" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="table-cell-strong text-nowrap">{{ payment.payment_datetime|en_date:"j M Y" }}</div>
+                            <div class="table-meta-text">{{ payment.payment_datetime|date:"H:i" }}</div>
+                        </td>
+                        <td><a href="{% url 'visit_detail' payment.visit_id %}" class="table-link table-link-primary">{{ payment.visit.patient.full_name }}</a></td>
+                        <td>{{ payment.get_type_display }}</td>
+                        <td class="text-end table-cell-strong{% if payment.type == 'REFUND' %} amount-negative{% endif %}">{{ payment.amount }}</td>
+                        <td><span class="badge-core badge-mbank">{{ payment.method.name }}</span></td>
+                        <td><span class="badge-core {% if payment.status == 'VERIFIED' %}status-completed{% elif payment.status == 'REJECTED' %}status-cancelled{% else %}status-pending{% endif %}">{{ payment.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="table-empty-cell table-empty-cell-lg">{% translate "No payments found." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if current_status %}{% with qs="&status="|add:current_status %}{% include 'core/partials/pager.html' %}{% endwith %}{% else %}{% include 'core/partials/pager.html' %}{% endif %}
+</div>
+{% endblock %}

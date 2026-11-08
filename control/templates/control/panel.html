@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load i18n umis_ui %}
+
+{% block title %}{% translate "Agent control" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="control-page">
+    <header class="control-head">
+        <div>
+            <h1 class="workspace-title">{% translate "Agent control" %}</h1>
+            <p class="control-meta">
+                {{ model_name|default:"No model configured" }}
+                · {% blocktranslate with on=enabled_count total=commands|length %}{{ on }} of {{ total }} commands allowed{% endblocktranslate %}
+                · {% blocktranslate count n=approval_count %}{{ n }} needs approval{% plural %}{{ n }} need approval{% endblocktranslate %}
+            </p>
+        </div>
+        <div class="control-status">
+            {% if policy.enabled %}
+            <span class="control-state is-running">{% translate "Running" %}</span>
+            {% else %}
+            <span class="control-state is-paused">{% translate "Paused" %}</span>
+            {% endif %}
+            {% if can_manage %}
+            <form method="post" action="{% url 'control_policy' %}">
+                {% csrf_token %}
+                {% if policy.enabled %}
+                <button type="submit" name="toggle" value="pause" class="btn-core btn-secondary">{% translate "Pause agent" %}</button>
+                {% else %}
+                <button type="submit" name="toggle" value="resume" class="btn-core btn-primary">{% translate "Resume agent" %}</button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+    <form method="post" action="{% url 'control_policy' %}" id="policy-form">
+        {% csrf_token %}
+        <fieldset class="control-fieldset" {% if not can_manage %}disabled{% endif %}>
+            <section class="control-section" aria-labelledby="behaviour-heading">
+                <div class="control-section-intro">
+                    <h2 class="control-section-title" id="behaviour-heading">{% translate "Behaviour" %}</h2>
+                </div>
+                <div class="control-fields">
+                    <div class="form-group">
+                        <label class="form-label" for="reasoning_effort">{% translate "Thinking effort" %}</label>
+                        <select id="reasoning_effort" name="reasoning_effort" class="form-control-core">
+                            {% for value, label in policy.EFFORT_CHOICES %}
+                            <option value="{{ value }}" {% if value == policy.reasoning_effort %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="max_steps">{% translate "Max steps per run" %}</label>
+                        <input id="max_steps" name="max_steps" type="number" min="1" max="12" value="{{ policy.max_steps }}" class="form-control-core">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="approval_minutes">{% translate "Approval window (minutes)" %}</label>
+                        <input id="approval_minutes" name="approval_minutes" type="number" min="1" max="15" value="{{ policy.approval_minutes }}" class="form-control-core">
+                    </div>
+                    <div class="form-group control-field-wide">
+                        <label class="form-label" for="instructions">{% translate "Extra instructions" %}</label>
+                        <textarea id="instructions" name="instructions" rows="3" maxlength="2000" class="form-control-core"
+                                  aria-describedby="instructions-hint">{{ policy.instructions }}</textarea>
+                        <span class="form-help-text" id="instructions-hint">{% translate "Can't override permissions, commands or approvals." %}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="control-section control-section-stacked" aria-labelledby="commands-heading">
+                <div class="control-section-intro">
+                    <h2 class="control-section-title" id="commands-heading">{% translate "Commands" %}</h2>
+                    <p>{% translate "Turn off a command to stop the agent using it." %}</p>
+                </div>
+                <table class="control-table">
+                    <thead>
+                        <tr>
+                            <th>{% translate "Command" %}</th>
+                            <th>{% translate "Roles" %}</th>
+                            <th class="control-check">{% translate "On" %}</th>
+                            <th class="control-check">{% translate "Needs approval" %}</th>
+                        </tr>
+                    </thead>
+                    {% regroup commands by group as groups %}
+                    {% for group in groups %}
+                    <tbody>
+                        <tr class="control-group-row">
+                            <td colspan="4">{{ group.grouper }}</td>
+                        </tr>
+                        {% for command in group.list %}
+                        <tr>
+                            <td>
+                                <span class="control-command">{{ command.name }}</span>
+                                <span class="control-muted">{{ command.description }}</span>
+                            </td>
+                            <td class="control-muted">{{ command.who }}</td>
+                            <td class="control-check">
+                                <input type="checkbox" name="enabled_commands" value="{{ command.name }}"
+                                       aria-label="{% blocktranslate with name=command.name %}Allow {{ name }}{% endblocktranslate %}"
+                                       {% if command.enabled %}checked{% endif %}>
+                            </td>
+                            <td class="control-check">
+                                {% if command.destructive %}
+                                <span class="control-muted">{% translate "Always" %}</span>
+                                {% else %}
+                                <input type="checkbox" name="approval_commands" value="{{ command.name }}"
+                                       aria-label="{% blocktranslate with name=command.name %}Require approval for {{ name }}{% endblocktranslate %}"
+                                       {% if command.approval %}checked{% endif %}>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endfor %}
+                </table>
+            </section>
+        </fieldset>
+
+        <div class="control-actions">
+            {% if can_manage %}
+            {% if policy.updated_by %}
+            <span class="control-muted">{% blocktranslate with who=policy.updated_by.get_username when=policy.updated_at|en_date %}Last changed by {{ who }}, {{ when }}{% endblocktranslate %}</span>
+            {% endif %}
+            <button type="submit" class="btn-core btn-primary">{% translate "Save policy" %}</button>
+            {% else %}
+            <span class="control-muted">{% translate "Read only. A superuser can change these." %}</span>
+            {% endif %}
+        </div>
+    </form>
+
+    <section class="control-section control-section-stacked" aria-labelledby="runs-heading">
+        <div class="control-section-intro">
+            <h2 class="control-section-title" id="runs-heading">{% translate "Recent runs" %}</h2>
+        </div>
+        {% if runs %}
+        <table class="control-table">
+            <thead>
+                <tr>
+                    <th>{% translate "Run" %}</th>
+                    <th>{% translate "Task" %}</th>
+                    <th>{% translate "Outcome" %}</th>
+                    <th class="control-num">{% translate "Started" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for run in runs %}
+                <tr>
+                    <td><a href="{% url 'control_run_detail' run.pk %}" class="table-link table-link-primary">#{{ run.pk }}</a></td>
+                    <td>{{ run.goal|truncatechars:110 }}</td>
+                    <td>{% include 'control/partials/outcome_badge.html' %}</td>
+                    <td class="control-num control-muted">{{ run.created_at|en_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="control-muted">
+            {% translate "No runs yet." %}
+            {% if perms.core.practice_medicine %}
+            {% url 'doctor_dashboard' as my_day_url %}
+            {% blocktranslate with url=my_day_url %}Start one from <a href="{{ url }}" class="table-link table-link-primary">My day</a> with Decline with assistant.{% endblocktranslate %}
+            {% endif %}
+        </p>
+        {% endif %}
+        {% if perms.core.view_auditlog or user.is_superuser %}
+        <p><a href="{% url 'control_audit' %}" class="table-link table-link-primary">{% translate "All agent activity" %} →</a></p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

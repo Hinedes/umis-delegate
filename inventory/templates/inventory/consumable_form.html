@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% if consumable %}{% translate "Edit consumable" %}{% else %}{% translate "New consumable" %}{% endif %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="form-shell" data-ui="consumable-form-shell">
+    <h1 class="form-title">{% if consumable %}{% translate "Edit consumable" %}{% else %}{% translate "New consumable" %}{% endif %}</h1>
+    <div class="card-core" data-ui="consumable-form-fields">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% include 'core/partials/form_fields.html' %}
+                <div class="form-actions">
+                    <a href="{% url 'inventory:stock_list' %}" class="btn-core btn-secondary">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn-core btn-primary">{% translate "Save" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
